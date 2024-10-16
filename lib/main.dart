@@ -35,21 +35,28 @@ class LoginScreen extends StatelessWidget {
             const Text(
               "Eduque seu bolso",
               style: TextStyle(
-                fontSize: 16,
+                fontFamily: 'Montserrat',
+                fontSize: 12,
                 color: Colors.black54,
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 100),
             // Container roxo com o formulário de login
             Expanded(
               child: Container(
                 width: double.infinity,
                 decoration: const BoxDecoration(
-                  color: Colors.purple,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(100),
-                    topRight: Radius.circular(100),
+                    topLeft: Radius.elliptical(125, 5),
+                    topRight: Radius.elliptical(300, 250)
                   ),
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.purpleAccent,
+                      Colors.purple
+                      ],
+                  )
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30.0),
