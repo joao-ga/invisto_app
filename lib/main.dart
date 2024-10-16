@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+
+Future<void> main() async{
+  print('Running App');
   runApp(const MyApp());
 }
 
