@@ -9,13 +9,13 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _cpfController = TextEditingController();
-  final _dobController = TextEditingController();
-  final _phoneController = TextEditingController();
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  final _confirmPassword = TextEditingController();
+  final _cpf = TextEditingController();
+  final _dob = TextEditingController();
+  final _phone = TextEditingController();
 
   bool _isLoading = false;
 
@@ -27,26 +27,27 @@ class _RegisterPageState extends State<RegisterPage> {
 
       // Dados do formulário
       Map<String, String> body = {
-        'name': _nameController.text,
-        'email': _emailController.text,
-        'password': _passwordController.text,
-        'cpf': _cpfController.text,
-        'dob': _dobController.text,
-        'phone': _phoneController.text,
+        'name': _name.text,
+        'email': _email.text,
+        'password': _password.text,
+        'cpf': _cpf.text,
+        'birth': _dob.text,
+        'phone': _phone.text,
+        'confirmedPassword': _confirmPassword.text
       };
 
       // Chamada à API
       var response = await http.post(
-        Uri.parse('SUA_API_URL'),
+        Uri.parse('http://localhost:5001/users/registration'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(body),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         var jsonResponse = jsonDecode(response.body);
 
         // Se o cadastro for bem-sucedido, autenticar usuário
-        _authenticateUser(_emailController.text, _passwordController.text);
+        _authenticateUser(_email.text, _password.text);
       } else {
         // Tratar erros
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -104,14 +105,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildTextField(_nameController, 'Nome Completo'),
-                    _buildTextField(_emailController, 'Email'),
-                    _buildPasswordField(_passwordController, 'Senha'),
+                    _buildTextField(_name, 'Nome Completo'),
+                    _buildTextField(_email, 'Email'),
+                    _buildPasswordField(_password, 'Senha'),
                     _buildPasswordField(
-                        _confirmPasswordController, 'Confirmação de Senha'),
-                    _buildTextField(_cpfController, 'CPF'),
-                    _buildTextField(_dobController, 'Data de nascimento'),
-                    _buildTextField(_phoneController, 'Telefone'),
+                        _confirmPassword, 'Confirmação de Senha'),
+                    _buildTextField(_cpf, 'CPF'),
+                    _buildTextField(_dob, 'Data de nascimento'),
+                    _buildTextField(_phone, 'Telefone'),
                     SizedBox(height: 20),
                     _isLoading
                         ? CircularProgressIndicator()
