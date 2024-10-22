@@ -1,7 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:invisto_app/screens/register_screen.dart';
+import 'home_screen.dart'; // Importação do Firebase Auth
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  Future<void> loginUser(BuildContext context) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      // Se o login for bem-sucedido, você pode navegar para outra tela, por exemplo
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login realizado com sucesso!')),
+      );
+      // Navegar para outra tela ou fazer algo após login
+      Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      String message = '';
+      if (e.code == 'user-not-found') {
+        message = 'Usuário não encontrado';
+      } else if (e.code == 'wrong-password') {
+        message = 'Senha incorreta';
+      } else {
+        message = 'Erro: ${e.message}';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +94,7 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 30),
                       // Campo de Email
                       TextField(
+                        controller: emailController, // Controller para email
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -71,6 +108,7 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       // Campo de Senha
                       TextField(
+                        controller: passwordController, // Controller para senha
                         obscureText: true,
                         decoration: InputDecoration(
                           filled: true,
@@ -85,7 +123,7 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 30),
                       // Botão de Entrar
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () => loginUser(context),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 100, vertical: 15),
@@ -105,7 +143,14 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       // Links para criar conta e esquecer senha
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          // Navegar para a RegisterScreen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RegisterPage()),
+                          );
+                        },
                         child: const Text(
                           "Não tem uma conta? Crie aqui",
                           style: TextStyle(

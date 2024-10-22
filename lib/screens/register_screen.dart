@@ -83,6 +83,26 @@ class _RegisterPageState extends State<RegisterPage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              // Botão de Voltar no canto superior esquerdo
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Voltar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
               // Logo e título
               SizedBox(height: 50),
               Text(
@@ -100,8 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     _buildTextField(_name, 'Nome Completo'),
                     _buildTextField(_email, 'Email'),
                     _buildPasswordField(_password, 'Senha'),
-                    _buildPasswordField(
-                        _confirmPassword, 'Confirmação de Senha'),
+                    _buildPasswordField(_confirmPassword, 'Confirmação de Senha'),
                     _buildTextField(_cpf, 'CPF'),
                     _buildTextField(_dob, 'Data de nascimento'),
                     _buildTextField(_phone, 'Telefone'),
