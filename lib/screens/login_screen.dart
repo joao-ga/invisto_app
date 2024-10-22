@@ -11,17 +11,19 @@ class LoginScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Espaço para o logo (deixe em branco conforme solicitado)
-            const SizedBox(height: 50),
-            const Text(
-              "Eduque seu bolso",
+            Image.asset(
+              'assets/images/BlackSemFundo.png',
+              height: 300,
+              width: 200,
+            ),
+            Text("Eduque seu bolso",
               style: TextStyle(
-                fontFamily: 'Montserrat',
-                fontSize: 12,
-                color: Colors.black54,
+                  fontFamily: 'Montserrat',
+                  fontSize: 20,
+                  color: Colors.black
               ),
             ),
-            const SizedBox(height: 100),
+            const SizedBox(height: 25),
             // Container roxo com o formulário de login
             Expanded(
               child: Container(
