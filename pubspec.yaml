@@ -87,8 +87,10 @@ flutter:
   fonts:
     - family: Montserrat
       fonts:
-          - asset: fonts/Montserrat-Italic-VariableFont_wght.ttf
-            style: italic
+        - asset: assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf
+          style: italic
+        - asset: assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf
+
   # fonts:
   #   - family: Schyler
   #     fonts:
