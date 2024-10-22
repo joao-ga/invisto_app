@@ -103,15 +103,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
 
-              // Logo e título
-              SizedBox(height: 50),
-              Text(
-                'Invisto',
-                style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+              Image.asset(
+                'assets/images/sloganpreto.png',
+                height: 200,
+                width: 200,
               ),
-              Text('Eduque seu bolso'),
-              SizedBox(height: 30),
-
               // Formulário de registro
               Form(
                 key: _formKey,
@@ -124,7 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     _buildTextField(_cpf, 'CPF'),
                     _buildTextField(_dob, 'Data de nascimento'),
                     _buildTextField(_phone, 'Telefone'),
-                    SizedBox(height: 20),
+                    SizedBox(height: 15),
                     _isLoading
                         ? CircularProgressIndicator()
                         : ElevatedButton(
