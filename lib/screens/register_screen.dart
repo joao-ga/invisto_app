@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -62,23 +63,14 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> _authenticateUser(String email, String password) async {
-    var response = await http.post(
-      Uri.parse('SUA_API_AUTHENTICATOR_URL'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      // Sucesso: Redirecionar ou salvar token
+    try {
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Usuário autenticado com sucesso!'),
-      ));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Falha na autenticação.'),
+        content: Text('Erro ao autenticar: $e'),
       ));
     }
   }
