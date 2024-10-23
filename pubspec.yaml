@@ -68,6 +68,8 @@ flutter:
     - assets/images/BlackSemFundo.png
     - assets/images/BlackSemFrase.png
     - assets/fonts/
+    - assets/images/sloganpreto.png
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

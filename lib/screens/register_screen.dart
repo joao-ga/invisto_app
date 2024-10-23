@@ -49,10 +49,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
         // Se o cadastro for bem-sucedido, autenticar usuário
         _authenticateUser(_email.text, _password.text);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Conta criada com sucesso!'),
+        ));
+        Navigator.pop(context);
       } else {
         // Tratar erros
+        var jsonResponse = jsonDecode(response.body);
+        var message = jsonResponse['error'] ?? 'Erro, entre em contato com o suporte!';
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Erro ao criar conta.'),
+          content: Text(message),
         ));
       }
 
@@ -101,7 +107,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-
+          
           // Logo e título
           const SizedBox(height: 10),
           Image.asset(
@@ -128,6 +134,9 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              // Formulário de registro
+              Form(
+                key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
