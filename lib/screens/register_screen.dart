@@ -84,108 +84,160 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Botão de Voltar no canto superior esquerdo
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      'Voltar',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.blue,
-                      ),
-                    ),
+      backgroundColor: Colors.grey[300],
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // Botão de Voltar no canto superior esquerdo
+          Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 40.0), // Aumentado para 40
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Voltar',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.blue,
                   ),
                 ),
               ),
+            ),
+          ),
+          
+          // Logo e título
+          const SizedBox(height: 10),
+          Image.asset(
+            'assets/images/BlackSemFrase.png',
+            height: 150, // Altura do logo
+            width: 200,
+          ),
+          const SizedBox(height: 10),
 
-              Image.asset(
-                'assets/images/sloganpreto.png',
-                height: 200,
-                width: 200,
+          // Container roxo com gradiente e form
+          Flexible(
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.elliptical(125, 5),
+                  topRight: Radius.elliptical(300, 250),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.purpleAccent, Colors.purple],
+                ),
               ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
               // Formulário de registro
               Form(
                 key: _formKey,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    _buildTextField(_name, 'Nome Completo'),
-                    _buildTextField(_email, 'Email'),
-                    _buildPasswordField(_password, 'Senha'),
-                    _buildPasswordField(_confirmPassword, 'Confirmação de Senha'),
-                    _buildTextField(_cpf, 'CPF'),
-                    _buildTextField(_dob, 'Data de nascimento'),
-                    _buildTextField(_phone, 'Telefone'),
-                    SizedBox(height: 15),
-                    _isLoading
-                        ? CircularProgressIndicator()
-                        : ElevatedButton(
-                      onPressed: _registerUser,
-                      child: Text('Criar conta'),
+                    const SizedBox(height: 15),
+                    // Formulário de registro
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          _buildTextField(_name, 'Nome Completo'),
+                          const SizedBox(height: 20),
+                          _buildTextField(_email, 'Email'),
+                          const SizedBox(height: 20),
+                          _buildPasswordField(_password, 'Senha'),
+                          const SizedBox(height: 20),
+                          _buildPasswordField(
+                              _confirmPassword, 'Confirmação de Senha'
+                          ),
+                          const SizedBox(height: 20),
+                          _buildTextField(_cpf, 'CPF'),
+                          const SizedBox(height: 20),
+                          _buildTextField(_dob, 'Data de nascimento'),
+                          const SizedBox(height: 20),
+                          _buildTextField(_phone, 'Telefone'),
+                          const SizedBox(height: 30),
+                          _isLoading
+                              ? const CircularProgressIndicator()
+                              : ElevatedButton(
+                            onPressed: _registerUser,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 100, vertical: 15),
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: const Text(
+                              'Criar conta',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
   // Função para criar campos de texto
   Widget _buildTextField(TextEditingController controller, String labelText) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: labelText,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide.none,
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Por favor, insira $labelText';
-          }
-          return null;
-        },
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, insira $labelText';
+        }
+        return null;
+      },
     );
   }
 
   // Função para criar campos de senha
   Widget _buildPasswordField(
       TextEditingController controller, String labelText) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        obscureText: true,
-        decoration: InputDecoration(
-          labelText: labelText,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+    return TextFormField(
+      controller: controller,
+      obscureText: true,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide.none,
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Por favor, insira $labelText';
-          }
-          return null;
-        },
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor, insira $labelText';
+        }
+        return null;
+      },
     );
   }
 }
