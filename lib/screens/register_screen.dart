@@ -134,58 +134,49 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
-              // Formulário de registro
-              Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 15),
-                    // Formulário de registro
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          _buildTextField(_name, 'Nome Completo'),
-                          const SizedBox(height: 20),
-                          _buildTextField(_email, 'Email'),
-                          const SizedBox(height: 20),
-                          _buildPasswordField(_password, 'Senha'),
-                          const SizedBox(height: 20),
-                          _buildPasswordField(
-                              _confirmPassword, 'Confirmação de Senha'
+                // Formulário de registro
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 15),
+                      _buildTextField(_name, 'Nome Completo'),
+                      const SizedBox(height: 20),
+                      _buildTextField(_email, 'Email'),
+                      const SizedBox(height: 20),
+                      _buildPasswordField(_password, 'Senha'),
+                      const SizedBox(height: 20),
+                      _buildPasswordField(_confirmPassword, 'Confirmação de Senha'),
+                      const SizedBox(height: 20),
+                      _buildTextField(_cpf, 'CPF'),
+                      const SizedBox(height: 20),
+                      _buildTextField(_dob, 'Data de nascimento'),
+                      const SizedBox(height: 20),
+                      _buildTextField(_phone, 'Telefone'),
+                      const SizedBox(height: 30),
+                      _isLoading
+                          ? const CircularProgressIndicator()
+                          : ElevatedButton(
+                        onPressed: _registerUser,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 100, vertical: 15),
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                          const SizedBox(height: 20),
-                          _buildTextField(_cpf, 'CPF'),
-                          const SizedBox(height: 20),
-                          _buildTextField(_dob, 'Data de nascimento'),
-                          const SizedBox(height: 20),
-                          _buildTextField(_phone, 'Telefone'),
-                          const SizedBox(height: 30),
-                          _isLoading
-                              ? const CircularProgressIndicator()
-                              : ElevatedButton(
-                            onPressed: _registerUser,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 100, vertical: 15),
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: const Text(
-                              'Criar conta',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                              ),
-                            ),
+                        ),
+                        child: const Text(
+                          'Criar conta',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
