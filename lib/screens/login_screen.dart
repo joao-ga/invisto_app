@@ -48,18 +48,10 @@ class LoginScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/BlackSemFundo.png',
-              height: 300,
-              width: 200,
+              'assets/images/sloganpreto.png',
+              height: 350,
+              width: 300,
             ),
-            Text("Eduque seu bolso",
-              style: TextStyle(
-                  fontFamily: 'Montserrat',
-                  fontSize: 20,
-                  color: Colors.black
-              ),
-            ),
-            const SizedBox(height: 25),
             // Container roxo com o formulário de login
             Expanded(
               child: Container(
@@ -87,11 +79,11 @@ class LoginScreen extends StatelessWidget {
                         "Já tem uma conta? Faça Seu login",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 15),
                       // Campo de Email
                       TextField(
                         controller: emailController, // Controller para email
@@ -105,7 +97,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 15),
                       // Campo de Senha
                       TextField(
                         controller: passwordController, // Controller para senha
@@ -120,7 +112,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 15),
                       // Botão de Entrar
                       ElevatedButton(
                         onPressed: () => loginUser(context),
