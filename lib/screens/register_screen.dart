@@ -85,41 +85,41 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // Botão de Voltar no canto superior esquerdo
-          Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 40.0), // Aumentado para 40
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Voltar',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.blue,
+      body: SingleChildScrollView( // Permite rolar a tela
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            // Botão de Voltar no canto superior esquerdo
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 40.0), // Aumentado para 40
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Voltar',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.blue,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          
-          // Logo e título
-          const SizedBox(height: 10),
-          Image.asset(
-            'assets/images/BlackSemFrase.png',
-            height: 150, // Altura do logo
-            width: 200,
-          ),
-          const SizedBox(height: 10),
 
-          // Container roxo com gradiente e form
-          Flexible(
-            child: Container(
+            // Logo e título
+            const SizedBox(height: 10),
+            Image.asset(
+              'assets/images/BlackSemFrase.png',
+              height: 150, // Altura do logo
+              width: 200,
+            ),
+            const SizedBox(height: 10),
+
+            // Container roxo com gradiente e formulário
+            Container(
               width: double.infinity,
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -180,8 +180,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
