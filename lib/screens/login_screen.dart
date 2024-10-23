@@ -49,15 +49,8 @@ class LoginScreen extends StatelessWidget {
           children: [
             Image.asset(
               'assets/images/BlackSemFundo.png',
-              height: 300,
+              height: 250,
               width: 200,
-            ),
-            Text("Eduque seu bolso",
-              style: TextStyle(
-                  fontFamily: 'Montserrat',
-                  fontSize: 20,
-                  color: Colors.black
-              ),
             ),
             const SizedBox(height: 25),
             // Container roxo com o formulário de login
