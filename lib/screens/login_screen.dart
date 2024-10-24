@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:invisto_app/screens/register_screen.dart';
-import 'home_screen.dart'; // Importação do Firebase Auth
+import 'home_screen.dart';
+import 'forgotpassword_screen.dart'; // Importação da tela de recuperação de senha
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -153,7 +154,14 @@ class LoginScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          // Navegar para a tela de recuperação de senha
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ForgotPasswordScreen()),
+                          );
+                        },
                         child: const Text(
                           "Esqueci minha senha!",
                           style: TextStyle(
