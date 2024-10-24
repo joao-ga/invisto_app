@@ -85,15 +85,15 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
-      body: SingleChildScrollView( // Permite rolar a tela
+      resizeToAvoidBottomInset: false, // Evita que o layout se mova quando o teclado é aberto
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // Botão de Voltar no canto superior esquerdo
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const EdgeInsets.only(top: 40.0), // Aumentado para 40
+                padding: const EdgeInsets.only(top: 40.0),
                 child: TextButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -108,53 +108,42 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
-
-            // Logo e título
             const SizedBox(height: 10),
+            // Logo
             Image.asset(
               'assets/images/BlackSemFrase.png',
-              height: 150, // Altura do logo
+              height: 150,
               width: 200,
             ),
             const SizedBox(height: 10),
 
             // Container roxo com gradiente e formulário
-            Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.elliptical(125, 5),
-                  topRight: Radius.elliptical(300, 250),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.elliptical(125, 5),
+                    topRight: Radius.elliptical(300, 250),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.purpleAccent, Colors.purple],
+                  ),
                 ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.purpleAccent, Colors.purple],
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                // Formulário de registro
-                child: Form(
-                  key: _formKey,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Espaçamento uniforme
                     children: [
-                      const SizedBox(height: 15),
                       _buildTextField(_name, 'Nome Completo'),
-                      const SizedBox(height: 20),
                       _buildTextField(_email, 'Email'),
-                      const SizedBox(height: 20),
                       _buildPasswordField(_password, 'Senha'),
-                      const SizedBox(height: 20),
                       _buildPasswordField(_confirmPassword, 'Confirmação de Senha'),
-                      const SizedBox(height: 20),
                       _buildTextField(_cpf, 'CPF'),
-                      const SizedBox(height: 20),
                       _buildTextField(_dob, 'Data de nascimento'),
-                      const SizedBox(height: 20),
                       _buildTextField(_phone, 'Telefone'),
-                      const SizedBox(height: 30),
                       _isLoading
                           ? const CircularProgressIndicator()
                           : ElevatedButton(
@@ -187,13 +176,13 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   // Função para criar campos de texto
-  Widget _buildTextField(TextEditingController controller, String labelText) {
+  Widget _buildTextField(TextEditingController controller, String hintText) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,
-        labelText: labelText,
+        hintText: hintText, // O texto agora ficará dentro do campo até o usuário digitar
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
@@ -201,7 +190,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Por favor, insira $labelText';
+          return 'Por favor, insira $hintText';
         }
         return null;
       },
@@ -210,14 +199,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Função para criar campos de senha
   Widget _buildPasswordField(
-      TextEditingController controller, String labelText) {
+      TextEditingController controller, String hintText) {
     return TextFormField(
       controller: controller,
       obscureText: true,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,
-        labelText: labelText,
+        hintText: hintText, // O texto agora ficará dentro do campo até o usuário digitar
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
@@ -225,7 +214,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Por favor, insira $labelText';
+          return 'Por favor, insira $hintText';
         }
         return null;
       },
