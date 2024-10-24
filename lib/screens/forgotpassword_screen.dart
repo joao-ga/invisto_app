@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 
 class ForgotPasswordScreen extends StatelessWidget {
   ForgotPasswordScreen({super.key});
@@ -7,24 +9,36 @@ class ForgotPasswordScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
 
   Future<void> resetPassword(BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(
-        email: emailController.text.trim(),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('E-mail de recuperação enviado!')),
-      );
-      Navigator.pop(context); // Volta para a tela anterior após o envio
-    } on FirebaseAuthException catch (e) {
-      String message = '';
-      if (e.code == 'user-not-found') {
-        message = 'Usuário não encontrado';
-      } else {
-        message = 'Erro: ${e.message}';
-      }
+    var response = await http.post(
+      Uri.parse('http://localhost:5001/users/validateUser'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({'email': emailController.text.trim()}),
+    );
 
+    if(response.statusCode == 201) {
+      try {
+        await FirebaseAuth.instance.sendPasswordResetEmail(
+          email: emailController.text.trim(),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('E-mail de recuperação enviado!')),
+        );
+        Navigator.pop(context);
+      } on FirebaseAuthException catch (e) {
+        String message = '';
+        if (e.code == 'user-not-found') {
+          message = 'Usuário não encontrado';
+        } else {
+          message = 'Erro: ${e.message}';
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(content: Text('E-mail não registrado!')),
       );
     }
   }
