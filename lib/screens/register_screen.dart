@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -37,9 +39,13 @@ class _RegisterPageState extends State<RegisterPage> {
         'confirmedPassword': _confirmPassword.text
       };
 
+      final String baseUrl = Platform.isIOS
+          ? 'http://localhost:5001/users/registration'
+          : 'http://10.0.2.2:5001/users/registration';
+
       // Chamada à API
       var response = await http.post(
-        Uri.parse('http://localhost:5001/users/registration'),
+        Uri.parse(baseUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(body),
       );

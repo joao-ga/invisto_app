@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -9,8 +10,11 @@ class ForgotPasswordScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
 
   Future<void> resetPassword(BuildContext context) async {
+    final String baseUrl = Platform.isIOS
+        ? 'http://localhost:5001/users/registration'
+        : 'http://10.0.2.2:5001/users/registration';
     var response = await http.post(
-      Uri.parse('http://localhost:5001/users/validateUser'),
+      Uri.parse(baseUrl),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({'email': emailController.text.trim()}),
     );

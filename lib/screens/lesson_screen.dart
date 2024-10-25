@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -21,8 +23,12 @@ class _LessonPageState extends State<LessonScreen> {
 
   // Função para buscar os dados da aula da API
   Future<void> fetchLessonData() async {
+    final String baseUrl = Platform.isIOS
+        ? 'http://localhost:5001/users/registration'
+        : 'http://10.0.2.2:5001/users/registration';
+
     final response = await http.post(
-        Uri.parse('http://localhost:5001/lessons/lesson'),
+        Uri.parse(baseUrl),
         headers: {
           'Content-Type': 'application/json',
         },
