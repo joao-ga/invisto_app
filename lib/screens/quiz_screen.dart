@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
 
 class QuizScreen extends StatefulWidget {
+  final Map<String, dynamic> quizData;
+  QuizScreen({super.key, required this.quizData});
+
   @override
   _QuizScreenState createState() => _QuizScreenState();
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  final double qtdInvicoin = 2; //qntd de Invicoin
-  final String lessonTopic = "Investimentos e Poupança"; //tema da aula
-  final String question = "Qual é a moeda usada no Brasil?"; //pergunta
-  final List<String> options = ["Dólar", "Euro", "Real", "Cruzeiro"]; //alterativas
+  late int qtdInvicoin;
+  late String lessonTopic;
+  late String question;
+  late List<String> options;
+  String? selectedOption;
 
-  String? selectedOption; //alternativa escolhida
+  @override
+  void initState() {
+    super.initState();
+    final quiz = widget.quizData['quiz'];
+
+    qtdInvicoin = quiz['addCoins'] ?? 0;
+    lessonTopic = quiz['subject'] ?? '';
+    question = quiz['question'] ?? '';
+    options = (quiz['answers'] as List<dynamic>).map((answer) => (answer as Map<String, dynamic>)['answer1'] as String).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +117,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  ElevatedButton(           //botao de confirmaçao
+                  ElevatedButton(
                     onPressed: selectedOption != null
                         ? () {
                       print("Resposta confirmada: $selectedOption");
