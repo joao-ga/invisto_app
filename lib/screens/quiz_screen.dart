@@ -1,5 +1,11 @@
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'home_screen.dart';
 
 class QuizScreen extends StatefulWidget {
   final Map<String, dynamic> quizData;
@@ -47,6 +53,30 @@ class _QuizScreenState extends State<QuizScreen> {
 
   bool confirmarResposta(Map<String, dynamic>? resposta){
    return resposta?['isTrue'];
+  }
+
+  Future<void> fetchAddCoin(int coins) async {
+    final String baseUrl = Platform.isIOS
+        ? 'http://localhost:5001/users/addcoins'
+        : 'http://10.0.2.2:5001/users/addcoins';
+
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+
+    final response = await http.post(
+      Uri.parse(baseUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'uid': '$uid', 'coins': coins}),
+    );
+
+    if(response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Você acertou e ganhou $coins Invicoins!')),
+      );
+    } else {
+      print("Erro ao carregar os dados.");
+    }
   }
 
   @override
@@ -149,10 +179,18 @@ class _QuizScreenState extends State<QuizScreen> {
                       if(confirmarResposta(selectedOption)){
                         // RESPOSTA CERTA
                         color = Colors.green;
+                        fetchAddCoin(qtdInvicoin);
                       }else{
                         // RESPOSTA ERRADA
-                        color = Colors.red;
+                        color = Colors.red;ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Você errou... Mais sorte na próxima...')),
+                        );
                       }
+                      Future.delayed(Duration(seconds: 1), (){
+                        Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
+                      });
                       print("Resposta confirmada: $selectedOption");
                     }
                         : null,
