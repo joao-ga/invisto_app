@@ -15,7 +15,7 @@ class _LessonPageState extends State<LessonScreen> {
   String introduction = '';
   String content = '';
   String subject = '';
-
+  int qtdInvicoin = 25;
   @override
   void initState() {
     super.initState();
@@ -110,11 +110,22 @@ class _LessonPageState extends State<LessonScreen> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(Icons.star_border),
-            onPressed: () {},
-          )
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Image.asset(
+              'assets/images/invicoin.png',
+              height: 30,
+              width: 30,
+            ),
+          ),
+          Text(
+            qtdInvicoin.toString(),
+            style: TextStyle(
+                fontSize: 18
+            ),
+          ),
         ],
+        backgroundColor: Colors.grey[300],
       ),
       body: Container(
         color: Colors.purple,
