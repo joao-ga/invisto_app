@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class QuizScreen extends StatefulWidget {
   final Map<String, dynamic> quizData;
@@ -12,18 +13,40 @@ class _QuizScreenState extends State<QuizScreen> {
   late int qtdInvicoin;
   late String lessonTopic;
   late String question;
-  late List<String> options;
-  String? selectedOption;
+  late List<Map<String, dynamic>> options;
+  Color color = Colors.deepPurpleAccent;
+  Map<String, dynamic>? selectedOption;
+  int countdown = 3; // Variável que inicia a contagem regressiva
+  bool showAnswers = false; // Variável que mostra as respostas após a contagem
 
   @override
   void initState() {
     super.initState();
+    startCountdown();
     final quiz = widget.quizData['quiz'];
 
     qtdInvicoin = quiz['addCoins'] ?? 0;
     lessonTopic = quiz['subject'] ?? '';
     question = quiz['question'] ?? '';
-    options = (quiz['answers'] as List<dynamic>).map((answer) => (answer as Map<String, dynamic>)['answer1'] as String).toList();
+    options = (quiz['answers'] as List<dynamic>).map((answer) => (answer as Map<String, dynamic>)).toList();
+  }
+
+  void startCountdown() {
+    Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        if (countdown > 1) {
+          countdown--;
+        } else {
+          countdown = 0;
+          showAnswers = true; // Exibe as respostas após a contagem
+          timer.cancel(); // Cancela o timer ao final da contagem
+        }
+      });
+    });
+  }
+
+  bool confirmarResposta(Map<String, dynamic>? resposta){
+   return resposta?['isTrue'];
   }
 
   @override
@@ -96,14 +119,14 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                   SizedBox(height: 20),
                   Expanded(
-                    child: ListView.builder(   //alternativas
+                    child:showAnswers ? ListView.builder(   //alternativas
                       itemCount: options.length,
                       itemBuilder: (context, index) {
                         return Card(
-                          color: selectedOption == options[index] ? Colors.deepPurpleAccent : Colors.white,
+                          color: selectedOption == options[index] ? color : Colors.white,
                           child: ListTile(
                             title: Text(
-                              options[index],
+                              options[index]['answer1'],
                               style: TextStyle(fontSize: 18),
                             ),
                             onTap: () {
@@ -114,12 +137,22 @@ class _QuizScreenState extends State<QuizScreen> {
                           ),
                         );
                       },
+                    ) : Text(
+                      countdown > 0 ? "$countdown" : "Começando...",
+                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                     ),
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: selectedOption != null
                         ? () {
+                      if(confirmarResposta(selectedOption)){
+                        // RESPOSTA CERTA
+                        color = Colors.green;
+                      }else{
+                        // RESPOSTA ERRADA
+                        color = Colors.red;
+                      }
                       print("Resposta confirmada: $selectedOption");
                     }
                         : null,
