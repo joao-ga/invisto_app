@@ -4,6 +4,7 @@ import 'package:invisto_app/screens/register_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'home_screen.dart'; // Importação do Firebase Auth
+import 'forgotpassword_screen.dart'; // Importação da tela de recuperação de senha
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -82,7 +83,7 @@ class LoginScreen extends StatelessWidget {
               height: 350,
               width: 300,
             ),
-            // Container roxo com o formulário de login
+
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -183,7 +184,14 @@ class LoginScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          // Navegar para a tela de recuperação de senha
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ForgotPasswordScreen()),
+                          );
+                        },
                         child: const Text(
                           "Esqueci minha senha!",
                           style: TextStyle(
