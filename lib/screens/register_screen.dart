@@ -59,6 +59,36 @@ class _RegisterPageState extends State<RegisterPage> {
           content: Text('Conta criada com sucesso!'),
         ));
         Navigator.pop(context);
+
+        //Com o cadastro bem-sucedido, chamar a função da API que adiciona o UID no banco de dados
+
+          //Pegar o uid do usuário logado
+          var userUid = FirebaseAuth.instance.currentUser?.uid;
+          var userEmail = FirebaseAuth.instance.currentUser?.email;
+          //Criando body do request
+          Map<String, String?> bodyRequest = {
+            'uid':userUid,
+            'email':userEmail
+          };
+
+          // Chamada à API
+          var responseUid = await http.post(
+            Uri.parse('http://localhost:5001/users/addUidUser'),
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode(bodyRequest),
+          );
+
+          if(responseUid.statusCode == 201){
+            // Sucesso
+          }else{
+            // Tratar erros
+            var jsonResponse = jsonDecode(responseUid.body);
+            var message = jsonResponse['error'] ?? 'Erro, entre em contato com o suporte!';
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(message),
+            ));
+          }
+
       } else {
         // Tratar erros
         var jsonResponse = jsonDecode(response.body);
