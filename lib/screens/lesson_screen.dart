@@ -15,7 +15,7 @@ class _LessonPageState extends State<LessonScreen> {
   String introduction = '';
   String content = '';
   String subject = '';
-  int qtdInvicoin = 25;
+  int qtdInvicoin = 250;
   @override
   void initState() {
     super.initState();
@@ -33,7 +33,7 @@ class _LessonPageState extends State<LessonScreen> {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: json.encode({'subject': 'teste'}),
+        body: json.encode({'subject': 'moeda'}),
     );
 
     if (response.statusCode == 200) {
