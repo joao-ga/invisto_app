@@ -1,6 +1,10 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:invisto_app/screens/quiz_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LessonScreen extends StatefulWidget {
   @override
@@ -12,6 +16,7 @@ class _LessonPageState extends State<LessonScreen> {
   String introduction = '';
   String content = '';
   String subject = '';
+  int qtdInvicoin = 250;
 
   @override
   void initState() {
@@ -21,12 +26,16 @@ class _LessonPageState extends State<LessonScreen> {
 
   // Função para buscar os dados da aula da API
   Future<void> fetchLessonData() async {
+    final String baseUrl = Platform.isIOS
+        ? 'http://localhost:5001/lessons/lesson'
+        : 'http://10.0.2.2:5001/lessons/lesson';
+
     final response = await http.post(
-        Uri.parse('http://localhost:5001/lessons/lesson'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({'subject': 'teste'}),
+      Uri.parse(baseUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'subject': 'moeda'}),
     );
 
     if (response.statusCode == 200) {
@@ -38,16 +47,42 @@ class _LessonPageState extends State<LessonScreen> {
         content = data['lesson']['content'];
         subject = data['lesson']['subject'];
       });
-
     } else {
       print("Erro ao carregar os dados.");
     }
   }
 
-  // Função para buscar o quiz referente ao subject
-  Future<Map<String, dynamic>> fetchQuiz() async {
+  Future<void> fetchAddCoin() async {
+    final String baseUrl = Platform.isIOS
+        ? 'http://localhost:5001/users/addcoins'
+        : 'http://10.0.2.2:5001/users/addcoins';
+
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+
     final response = await http.post(
-      Uri.parse('http://localhost:5001/quizzes/quiz'),
+      Uri.parse(baseUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'uid': '$uid', 'coins': 50}),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Você ganhou 50 Invicoins!')),
+      );
+    } else {
+      print("Erro ao carregar os dados.");
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchQuiz() async {
+    final String baseUrl = Platform.isIOS
+        ? 'http://localhost:5001/quizzes/quiz'
+        : 'http://10.0.2.2:5001/quizzes/quiz';
+
+    final response = await http.post(
+      Uri.parse(baseUrl),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -55,7 +90,7 @@ class _LessonPageState extends State<LessonScreen> {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body); // Retorna o quiz
+      return json.decode(response.body);
     } else {
       throw Exception('Erro ao carregar o quiz');
     }
@@ -72,131 +107,125 @@ class _LessonPageState extends State<LessonScreen> {
           },
         ),
         title: Image.asset(
-          'assets/BlackSemFrase.png',
-          height: 40,
+          'assets/images/BlackSemFrase.png',
+          height: 100,
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(Icons.star_border),
-            onPressed: () {},
-          )
-        ],
-      ),
-      body: Container(
-        color: Colors.purple,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              title.isEmpty ? 'TÍTULO DA AULA' : title.toUpperCase(),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              introduction.isEmpty ? 'INTRODUÇÃO' : introduction.toUpperCase(),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              content.isEmpty ? 'CONTEÚDO' : content.toUpperCase(),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Row(
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Ação do botão encerrar
-                  },
-                  child: Text('ENCERRAR'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white, // Substitui 'primary'
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                Text(
+                  qtdInvicoin.toString(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      final quizData = await fetchQuiz();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QuizPage(quizData: quizData),
-                        ),
-                      );
-                    } catch (e) {
-                      print('Erro ao carregar o quiz: $e');
-                    }
-                  },
-                  child: Text('QUIZ'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white, // Substitui 'primary'
-                    foregroundColor: Colors.black, // Substitui 'onPrimary'
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
+                SizedBox(width: 6),
+                Image.asset(
+                  'assets/images/invicoin.png',
+                  height: 25,
+                  width: 25,
                 ),
-
               ],
             ),
-            SizedBox(height: 20),
-          ],
-        ),
+          ),
+        ],
+        backgroundColor: Colors.grey[300],
       ),
-    );
-  }
-}
-
-class QuizPage extends StatelessWidget {
-  final Map<String, dynamic> quizData;
-
-  QuizPage({required this.quizData});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Quiz'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text(
-              'Perguntas do Quiz:',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: quizData['questions'].length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(quizData['questions'][index]['question']),
-                  );
-                },
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.purple,
+          width: double.infinity,
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                title.isEmpty ? 'TÍTULO DA AULA' : title.toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      introduction.isEmpty ? 'INTRODUÇÃO' : introduction,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      content.isEmpty ? 'CONTEÚDO' : content,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      await fetchAddCoin();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('ENCERRAR'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        final quizData = await fetchQuiz();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizScreen(quizData: quizData),
+                          ),
+                        );
+                      } catch (e) {
+                        print('Erro ao carregar o quiz: $e');
+                      }
+                    },
+                    child: Text('QUIZ'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

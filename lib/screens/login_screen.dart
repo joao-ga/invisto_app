@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:invisto_app/screens/register_screen.dart';
-import 'home_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'home_screen.dart'; // Importação do Firebase Auth
 import 'forgotpassword_screen.dart'; // Importação da tela de recuperação de senha
 
 class LoginScreen extends StatelessWidget {
@@ -24,6 +26,34 @@ class LoginScreen extends StatelessWidget {
       Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
+
+      //Pegar o uid do usuário logado
+      var userUid = FirebaseAuth.instance.currentUser?.uid;
+      var userEmail = FirebaseAuth.instance.currentUser?.email;
+      //Criando body do request
+      Map<String, String?> bodyRequest = {
+        'uid':userUid,
+        'email':userEmail
+      };
+
+      // Chamada à API
+      var responseUid = await http.post(
+        Uri.parse('http://10.0.2.2:5001/users/adduid'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(bodyRequest),
+      );
+
+      if(responseUid.statusCode == 200){
+        // Sucesso
+        print('UID ADICIONADA COM SUCESSO!');
+      }else{
+        // Tratar erros
+        var jsonResponse = jsonDecode(responseUid.body);
+        var message = jsonResponse['error'] ?? 'Uid Erro, entre em contato com o suporte!';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(message),
+        ));
+      }
     } on FirebaseAuthException catch (e) {
       String message = '';
       if (e.code == 'user-not-found') {
@@ -53,7 +83,7 @@ class LoginScreen extends StatelessWidget {
               height: 350,
               width: 300,
             ),
-            // Container roxo com o formulário de login
+
             Expanded(
               child: Container(
                 width: double.infinity,

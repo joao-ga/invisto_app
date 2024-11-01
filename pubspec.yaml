@@ -67,7 +67,7 @@ flutter:
   assets:
     - assets/images/BlackSemFundo.png
     - assets/images/BlackSemFrase.png
-    - assets/fonts/
+    - assets/images/invicoin.png
     - assets/images/sloganpreto.png
 
 
