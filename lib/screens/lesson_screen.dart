@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:invisto_app/screens/quiz_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LessonScreen extends StatefulWidget {
   @override
@@ -56,12 +57,14 @@ class _LessonPageState extends State<LessonScreen> {
         ? 'http://localhost:5001/users/addcoins'
         : 'http://10.0.2.2:5001/users/addcoins';
 
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+
     final response = await http.post(
       Uri.parse(baseUrl),
       headers: {
         'Content-Type': 'application/json',
       },
-      body: json.encode({'uid': 'bJEL76Pa2BOIoHNfBH5YiyU6yYq2', 'coins': 50}),
+      body: json.encode({'uid': '$uid', 'coins': 50}),
     );
 
     if (response.statusCode == 200) {
