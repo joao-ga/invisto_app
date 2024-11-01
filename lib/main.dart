@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:invisto_app/screens/lesson_screen.dart';
 import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 
