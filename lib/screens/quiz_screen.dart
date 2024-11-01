@@ -160,7 +160,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     color: selectedOption == options[index] ? color : Colors.white,
                     child: ListTile(
                       title: Text(
-                        options[index]['answer1'],
+                        options[index]['answer1'], // Corrigir o índice caso necessário
                         style: TextStyle(fontSize: 18),
                       ),
                       onTap: () {
@@ -168,40 +168,6 @@ class _QuizScreenState extends State<QuizScreen> {
                           selectedOption = options[index];
                         });
                       },
-                    ) : Text(
-                      countdown > 0 ? "$countdown" : "Começando...",
-                      style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: selectedOption != null
-                        ? () {
-                      if(confirmarResposta(selectedOption)){
-                        // RESPOSTA CERTA
-                        color = Colors.green;
-                        fetchAddCoin(qtdInvicoin);
-                      }else{
-                        // RESPOSTA ERRADA
-                        color = Colors.red;ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Você errou... Mais sorte na próxima...')),
-                        );
-                      }
-                      Future.delayed(Duration(seconds: 1), (){
-                        Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                        );
-                      });
-                      print("Resposta confirmada: $selectedOption");
-                    }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black, backgroundColor: Colors.greenAccent,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: Text(
-                      'Confirmar Resposta',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   );
                 },
