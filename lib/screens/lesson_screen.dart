@@ -5,53 +5,46 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:invisto_app/screens/quiz_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:invisto_app/services/lesson-service.dart';
+import 'package:invisto_app/services/quiz-service.dart';
 
 import '../services/coin-service.dart';
 
 class LessonScreen extends StatefulWidget {
+  late final String subject;
+  LessonScreen({required this.subject});
+
   @override
   _LessonPageState createState() => _LessonPageState();
 }
 
 class _LessonPageState extends State<LessonScreen> {
   late final CoinService _coinService;
+  late final LessonService _lessonService;
+  late final QuizService _quizService;
   String title = '';
   String introduction = '';
   String content = '';
-  String subject = '';
   late int qtdInvicoin = 0;
 
   @override
   void initState() {
     super.initState();
     _coinService = CoinService();
+    _lessonService = LessonService();
+    _quizService = QuizService();
     _getCoin();
     fetchLessonData();
-
   }
 
   // Função para buscar os dados da aula da API
   Future<void> fetchLessonData() async {
-    final String baseUrl = Platform.isIOS
-        ? 'http://localhost:5001/lessons/lesson'
-        : 'http://10.0.2.2:5001/lessons/lesson';
-
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({'subject': 'moeda'}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
+    final lesson = await _lessonService.getLesson(widget.subject);
+    if (lesson != null && lesson.containsKey('lesson')) {
       setState(() {
-        title = data['lesson']['title'];
-        introduction = data['lesson']['introduction'];
-        content = data['lesson']['content'];
-        subject = data['lesson']['subject'];
+        title = lesson['lesson']['title'];
+        introduction = lesson['lesson']['introduction'];
+        content = lesson['lesson']['content'];
       });
     } else {
       print("Erro ao carregar os dados.");
@@ -79,20 +72,9 @@ class _LessonPageState extends State<LessonScreen> {
   }
 
   Future<Map<String, dynamic>> fetchQuiz() async {
-    final String baseUrl = Platform.isIOS
-        ? 'http://localhost:5001/quizzes/quiz'
-        : 'http://10.0.2.2:5001/quizzes/quiz';
-
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({'subject': 'Moeda'}),
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
+    final quiz = await _quizService.gerQuiz(widget.subject);
+    if(quiz != null) {
+      return quiz;
     } else {
       throw Exception('Erro ao carregar o quiz');
     }

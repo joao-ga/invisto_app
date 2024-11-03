@@ -13,8 +13,9 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreenState extends State<QuizScreen> {
   late final CoinService _coinService;
-  late int qtdInvicoin;
+  late int qtdInvicoin = 0;
   late String lessonTopic;
+  late int addCoins;
   late String question;
   late List<Map<String, dynamic>> options;
   Color color = Colors.deepPurpleAccent;
@@ -24,13 +25,13 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   void initState() {
-    _getCoin();
     super.initState();
     _coinService = CoinService();
+    _getCoin();
     startCountdown();
-    final quiz = widget.quizData['quiz'];
 
-    //qtdInvicoin = quiz['addCoins'] ?? 0;
+    final quiz = widget.quizData['quiz'];
+    addCoins = quiz['addCoins'] ?? 0;
     lessonTopic = quiz['subject'] ?? '';
     question = quiz['question'] ?? '';
     options = (quiz['answers'] as List<dynamic>).map((answer) => (answer as Map<String, dynamic>)).toList();
@@ -180,7 +181,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   ? () {
                 if(confirmarResposta(selectedOption)){
                   //RESPOSTA CERTA
-                  _addCoins(qtdInvicoin);
+                  _addCoins(addCoins);
                 }else{
                   //RESPOSTA ERRADA
                   ScaffoldMessenger.of(context).showSnackBar(
