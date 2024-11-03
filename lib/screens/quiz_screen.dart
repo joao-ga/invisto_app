@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../services/coin-service.dart';
+import 'home_screen.dart';
 
 class QuizScreen extends StatefulWidget {
   final Map<String, dynamic> quizData;
@@ -179,7 +180,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   ? () {
                 if(confirmarResposta(selectedOption)){
                   //RESPOSTA CERTA
-                  fetchAddCoin(qtdInvicoin);
+                  _addCoins(qtdInvicoin);
                 }else{
                   //RESPOSTA ERRADA
                   ScaffoldMessenger.of(context).showSnackBar(
