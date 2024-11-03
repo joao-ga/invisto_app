@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:invisto_app/services/lesson-service.dart';
 import '../services/coin-service.dart';
+import 'lesson_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -8,13 +10,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final CoinService _coinService;
+  late final LessonService _lessonService;
+  List<dynamic> lessons = [];
   late int qtdInvicoin;
 
   @override
   void initState() {
     super.initState();
     _coinService = CoinService();
+    _lessonService = LessonService();
     _getCoin();
+    allLessons();
   }
 
   Future<void> _getCoin() async {
@@ -26,6 +32,15 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Sucesso ao buscar as moedas.");
     } else {
       print("Erro ao buscar as moedas.");
+    }
+  }
+
+  Future<void> allLessons() async {
+    final fetchedLessons = await _lessonService.getAllLessons();
+    if (fetchedLessons != null) {
+      setState(() {
+        lessons = fetchedLessons;
+      });
     }
   }
 
@@ -56,11 +71,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: Container(
-        color: Colors.purple[700], // Cor de background geral
+        color: Colors.purple[700],
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título "Suas próximas aulas" com padding individual
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -83,11 +97,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  itemCount: 4,
+                  itemCount: lessons.length,
                   itemBuilder: (context, index) {
+                    final lesson = lessons[index];
                     return Padding(
                       padding: const EdgeInsets.only(right: 10.0),
-                      child: _buildClassCard("Aula ${index + 1}"),
+                      child: _buildClassCard(lesson),
                     );
                   },
                 ),
@@ -120,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildClassCard(String className) {
+  Widget _buildClassCard(dynamic lesson) {
     return AspectRatio(
       aspectRatio: 1,
       child: Material(
@@ -128,21 +143,23 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(100),
         child: InkWell(
           onTap: () {
-            print('$className foi clicado');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LessonScreen(subject: lesson['subject']),
+              ),
+            );
           },
           splashColor: Colors.purple[300],
           highlightColor: Colors.purple[200],
           borderRadius: BorderRadius.circular(100),
-          child: Container(
-            margin: EdgeInsets.only(right: 10),
-            child: Center(
-              child: Text(
-                className,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+          child: Center(
+            child: Text(
+              "Aula ${lesson['subject']}",
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
