@@ -1,11 +1,6 @@
-import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import 'home_screen.dart';
+import '../services/coin-service.dart';
 
 class QuizScreen extends StatefulWidget {
   final Map<String, dynamic> quizData;
@@ -16,6 +11,7 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+  late final CoinService _coinService;
   late int qtdInvicoin;
   late String lessonTopic;
   late String question;
@@ -27,11 +23,13 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   void initState() {
+    _getCoin();
     super.initState();
+    _coinService = CoinService();
     startCountdown();
     final quiz = widget.quizData['quiz'];
 
-    qtdInvicoin = quiz['addCoins'] ?? 0;
+    //qtdInvicoin = quiz['addCoins'] ?? 0;
     lessonTopic = quiz['subject'] ?? '';
     question = quiz['question'] ?? '';
     options = (quiz['answers'] as List<dynamic>).map((answer) => (answer as Map<String, dynamic>)).toList();
@@ -55,28 +53,24 @@ class _QuizScreenState extends State<QuizScreen> {
     return resposta?['isTrue'] ?? false;
   }
 
-  Future<void> fetchAddCoin(int coins) async {
-    final String baseUrl = Platform.isIOS
-        ? 'http://localhost:5001/users/addcoins'
-        : 'http://10.0.2.2:5001/users/addcoins';
-
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({'uid': '$uid', 'coins': coins}),
-    );
-
-    if(response.statusCode == 200) {
+  Future<void> _addCoins(int coins) async {
+    final success = await _coinService.fetchAddCoin(coins);
+    if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Você acertou e ganhou $coins Invicoins!')),
       );
     } else {
-      print("Erro ao carregar os dados.");
+      print("Erro ao adicionar as moedas.");
     }
+  }
+
+  Future<void> _getCoin() async {
+      final coin = await _coinService.fetchUserCoins();
+      if(coin != null) {
+        qtdInvicoin = coin;
+      } else {
+        print("Erro ao buscar as moedas.");
+      }
   }
 
   @override
