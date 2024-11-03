@@ -177,6 +177,20 @@ class _QuizScreenState extends State<QuizScreen> {
             ElevatedButton(
               onPressed: selectedOption != null
                   ? () {
+                if(confirmarResposta(selectedOption)){
+                  //RESPOSTA CERTA
+                  fetchAddCoin(qtdInvicoin);
+                }else{
+                  //RESPOSTA ERRADA
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Você errou... Mais sorte na próxima...')),);
+                }
+                //Chamar tela de Home
+                Future.delayed(Duration(seconds: 1), (){
+                  Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                  );
+                });
                 setState(() {
                   color = confirmarResposta(selectedOption) ? Colors.green : Colors.red;
                 });
