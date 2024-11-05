@@ -87,22 +87,28 @@ class _QuizScreenState extends State<QuizScreen> {
         ),
         title: Image.asset(
           'assets/images/BlackSemFrase.png',
-          height: 40,
+          height: 100,
         ),
         centerTitle: true,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
-            child: Image.asset(
-              'assets/images/invicoin.png',
-              height: 30,
-              width: 30,
-            ),
-          ),
-          Text(
-            qtdInvicoin.toString(),
-            style: TextStyle(
-              fontSize: 18
+            child: Row(
+              children: [
+                Text(
+                  qtdInvicoin.toString(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(width: 6),
+                Image.asset(
+                  'assets/images/invicoin.png',
+                  height: 25,
+                  width: 25,
+                ),
+              ],
             ),
           ),
         ],
