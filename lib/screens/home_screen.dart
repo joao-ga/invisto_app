@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:invisto_app/services/lesson-service.dart';
 import '../services/coin-service.dart';
 import 'lesson_screen.dart';
+import 'investment_screen.dart'; // Importe a InvestmentScreen
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -128,6 +129,21 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(16.0),
               child: _buildInvestmentSimulation(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InvestmentScreen()),
+                    );
+                  },
+                  child: Text('Investimentos'),
+                ),
+              ),
             ),
           ],
         ),
