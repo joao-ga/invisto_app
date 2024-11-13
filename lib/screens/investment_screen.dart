@@ -1,7 +1,33 @@
 import 'package:flutter/material.dart';
 
-class InvestmentScreen extends StatelessWidget {
+import '../services/coin-service.dart';
+
+class InvestmentScreen extends StatefulWidget {
+  @override
+  _InvestmentScreenState createState() => _InvestmentScreenState();
+}
+
+class _InvestmentScreenState extends State<InvestmentScreen> {
+  late final CoinService _coinService;
   int qtdInvicoin = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _coinService = CoinService();
+    _getCoin();
+  }
+
+  Future<void> _getCoin() async {
+    final coin = await _coinService.fetchUserCoins();
+    if (coin != null) {
+      setState(() {
+        qtdInvicoin = coin;
+      });
+    } else {
+      print("Erro ao buscar as moedas.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
