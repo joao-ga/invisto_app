@@ -56,10 +56,10 @@ class InvestmentScreen extends StatelessWidget {
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
           children: [
-            CompanyCard(companyName: 'Apple'),
-            CompanyCard(companyName: 'Pfizer'),
-            CompanyCard(companyName: 'Microsoft'),
-            CompanyCard(companyName: 'Amazon'),
+            CompanyCard(companyName: 'Apple', stockInfo: 'AAPL - 1.5% daily gain'),
+            CompanyCard(companyName: 'Pfizer', stockInfo: 'PFE - 2.3% daily gain'),
+            CompanyCard(companyName: 'Microsoft', stockInfo: 'MSFT - 1.2% daily gain'),
+            CompanyCard(companyName: 'Amazon', stockInfo: 'AMZN - 1.8% daily gain'),
           ],
         ),
       ),
@@ -69,32 +69,59 @@ class InvestmentScreen extends StatelessWidget {
 
 class CompanyCard extends StatelessWidget {
   final String companyName;
+  final String stockInfo;
 
-  const CompanyCard({Key? key, required this.companyName}) : super(key: key);
+  const CompanyCard({
+    Key? key,
+    required this.companyName,
+    required this.stockInfo,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 4,
-            offset: Offset(2, 2),
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(companyName),
+              content: Text(
+                stockInfo,
+                style: TextStyle(fontSize: 16),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Fechar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 4,
+              offset: Offset(2, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            companyName,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.purple,
+            ),
+            textAlign: TextAlign.center,
           ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          companyName,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.purple,
-          ),
-          textAlign: TextAlign.center,
         ),
       ),
     );
