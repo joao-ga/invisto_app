@@ -31,8 +31,8 @@ class CoinService {
     );
 
     if (response.statusCode == 201) {
-      final data = json.decode(response.body);
-      return data['coin'];
+      final responseData = json.decode(response.body);
+      return responseData['data']['coin'];
     } else {
       print("Erro ao buscar o saldo de moedas.");
       return null;
