@@ -25,7 +25,7 @@ class CoinService {
   Future<int?> fetchUserCoins() async {
 
     final response = await http.post(
-      Uri.parse('$baseUrl/getusercoins'),
+      Uri.parse('$baseUrl/getuserdata'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'uid': uid}),
     );
