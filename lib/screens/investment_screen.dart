@@ -82,10 +82,10 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
           children: [
-            CompanyCard(companyName: 'Apple', stockInfo: 'AAPL - 1.5% daily gain'),
-            CompanyCard(companyName: 'Pfizer', stockInfo: 'PFE - 2.3% daily gain'),
-            CompanyCard(companyName: 'Microsoft', stockInfo: 'MSFT - 1.2% daily gain'),
-            CompanyCard(companyName: 'Amazon', stockInfo: 'AMZN - 1.8% daily gain'),
+            CompanyCard(companyName: 'Apple'),
+            CompanyCard(companyName: 'Pfizer'),
+            CompanyCard(companyName: 'Microsoft'),
+            CompanyCard(companyName: 'Amazon'),
           ],
         ),
       ),
@@ -95,36 +95,14 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
 
 class CompanyCard extends StatelessWidget {
   final String companyName;
-  final String stockInfo;
 
-  const CompanyCard({
-    Key? key,
-    required this.companyName,
-    required this.stockInfo,
-  }) : super(key: key);
+  const CompanyCard({Key? key, required this.companyName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text(companyName),
-              content: Text(
-                stockInfo,
-                style: TextStyle(fontSize: 16),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Fechar'),
-                ),
-              ],
-            );
-          },
-        );
+        _showInvestmentDialog(context, companyName);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -152,4 +130,117 @@ class CompanyCard extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showInvestmentDialog(BuildContext context, String companyName) {
+  int quantity = 1;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            title: Text(
+              companyName,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Informações do diálogo
+                const Text("Máxima do dia: R\$ 150.00"),
+                const Text("Mínima do dia: R\$ 130.00"),
+                const Text("Variação: +2.5%"),
+                const SizedBox(height: 100),
+                const SizedBox(width: 300),
+
+                // Botões de controle de quantidade
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        if (quantity > 1) {
+                          setState(() {
+                            quantity--;
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.remove),
+                    ),
+                    Text(
+                      '$quantity',
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          quantity++;
+                        });
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Botões de ação usando Wrap para evitar overflow
+                // Botões de ação usando Row para centralizar e espaçar uniformemente
+                // Botões de ação usando Row para centralizar e espaçar uniformemente
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 90,
+                      height: 35,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Vender",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12), // Espaçamento entre os botões
+                    SizedBox(
+                      width: 90,
+                      height: 35,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Comprar",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
 }
