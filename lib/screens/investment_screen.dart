@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,27 +6,33 @@ import 'package:invisto_app/services/stock-service.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../services/coin-service.dart';
+import '../services/user-service.dart';
 
 class InvestmentScreen extends StatefulWidget {
+  final String type;
+
+  const InvestmentScreen({required this.type});
+
   @override
   _InvestmentScreenState createState() => _InvestmentScreenState();
 }
 
 class _InvestmentScreenState extends State<InvestmentScreen> {
-  late final CoinService _coinService;
+  late final UserService _userService;
 
   int qtdInvicoin = 0;
+  List<Widget> listStocks = [];
 
   @override
   void initState() {
     super.initState();
-    _coinService = CoinService();
+    _userService = UserService();
     _getCoin();
+    _loadStocks();
   }
 
   Future<void> _getCoin() async {
-    final coin = await _coinService.fetchUserCoins();
+    final coin = await _userService.fetchUserCoins();
     if (coin != null) {
       setState(() {
         qtdInvicoin = coin;
@@ -35,6 +42,34 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
     }
   }
 
+  Future<void> _loadStocks() async {
+    if (widget.type == 'stocks') {
+      // Carregar ações padrão
+      setState(() {
+        listStocks = [
+          CompanyCard(stockCode: 'AAPL'),
+          CompanyCard(stockCode: 'AMZN'),
+          CompanyCard(stockCode: 'NKE'),
+          CompanyCard(stockCode: 'DIS'),
+          CompanyCard(stockCode: 'TSLA'),
+          CompanyCard(stockCode: 'NVDA'),
+        ];
+      });
+    } else if (widget.type == 'myStocks') {
+      // Carregar ações do usuário
+      final stocks = await _userService.fetchUserStocks();
+      print("Stocks recebidos: $stocks");
+
+      if (stocks != null && stocks.isNotEmpty) {
+        setState(() {
+          // Aqui mapeamos a lista de strings para a lista de Widgets
+          listStocks = stocks.map<Widget>((stock) => CompanyCard(stockCode: stock)).toList();
+        });
+      } else {
+        print("Erro ao buscar ações do usuário.");
+      }
+    }
+  }
 
 
   @override
@@ -42,15 +77,12 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Image.asset(
-          'assets/images/BlackSemFrase.png',
-          height: 100,
-        ),
+        title: Text(widget.type == 'stocks' ? 'Investimentos' : 'Meus Investimentos'),
         centerTitle: true,
         actions: [
           Padding(
@@ -59,12 +91,12 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
               children: [
                 Text(
                   qtdInvicoin.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
                 Image.asset(
                   'assets/images/invicoin.png',
                   height: 25,
@@ -85,18 +117,15 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
             colors: [Colors.purpleAccent, Colors.purple],
           ),
         ),
-        child: GridView.count(
+        child: listStocks.isEmpty
+            ? const Center(
+          child: CircularProgressIndicator(),
+        )
+            : GridView.count(
           crossAxisCount: 2,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
-          children: [
-            CompanyCard(stockCode: 'AAPL'),
-            CompanyCard(stockCode: 'AMZN'),
-            CompanyCard(stockCode: 'NKE'),
-            CompanyCard(stockCode: 'DIS'),
-            CompanyCard(stockCode: 'TSLA'),
-            CompanyCard(stockCode: 'NVDA'),
-          ],
+          children: listStocks,
         ),
       ),
     );

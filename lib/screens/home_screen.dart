@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invisto_app/services/lesson-service.dart';
-import '../services/coin-service.dart';
+import '../services/user-service.dart';
 import 'lesson_screen.dart';
 import 'investment_screen.dart'; // Importe a InvestmentScreen
 
@@ -10,7 +10,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final CoinService _coinService;
+  late final UserService _userService;
   late final LessonService _lessonService;
   List<dynamic> lessons = [];
   late int qtdInvicoin;
@@ -18,14 +18,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _coinService = CoinService();
+    _userService = UserService();
     _lessonService = LessonService();
     _getCoin();
     allLessons();
   }
 
   Future<void> _getCoin() async {
-    final coin = await _coinService.fetchUserCoins();
+    final coin = await _userService.fetchUserCoins();
     if (coin != null) {
       setState(() {
         qtdInvicoin = coin;
@@ -132,19 +132,39 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => InvestmentScreen()),
-                    );
-                  },
-                  child: Text('Investimentos'),
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => InvestmentScreen(type: 'stocks'),
+                          ),
+                        );
+                      },
+                      child: Text('Investimentos'),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => InvestmentScreen(type: 'myStocks'),
+                          ),
+                        );
+                      },
+                      child: Text('Meus Investimentos'),
+                    ),
+                  ),
+                ],
               ),
             ),
+
           ],
         ),
       ),
