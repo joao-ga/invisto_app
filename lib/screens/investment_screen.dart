@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:invisto_app/services/stock-service.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import '../services/coin-service.dart';
 
@@ -88,6 +92,10 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
           children: [
             CompanyCard(stockCode: 'AAPL'),
             CompanyCard(stockCode: 'AMZN'),
+            CompanyCard(stockCode: 'NKE'),
+            CompanyCard(stockCode: 'DIS'),
+            CompanyCard(stockCode: 'TSLA'),
+            CompanyCard(stockCode: 'NVDA'),
           ],
         ),
       ),
@@ -103,14 +111,29 @@ class CompanyCard extends StatelessWidget {
 
   CompanyCard({super.key, required this.stockCode});
 
-  final StockService _stockService = StockService();
+  final String baseUrl = Platform.isIOS
+      ? 'http://localhost:5001/stocks'
+      : 'http://10.0.2.2:5001/stocks';
 
-  Future<void> fetchStockData(String code) async {
-    final stock = await _stockService.getStock(code);
+  Future<dynamic> getStock(String code) async {
+    print("getStock");
+    final response = await http.post(
+      Uri.parse('$baseUrl/getLastPrice'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'code': code}),
+    );
+    final data = json.decode(response.body);
+    print("Data: $data");
+    return data;
+  }
+
+  Future<void> fetchStockData() async {
+    print("fetchStockData");
+    final stock = await getStock(stockCode);
     if (stock != null) {
-        high = stock['high'];
-        low = stock['low'];
-        price = stock['last'];
+        high = stock[0]['high'].toString();
+        low = stock[0]['low'].toString();
+        price = stock[0]['last'].toString();
     } else {
       print("Erro ao carregar os dados.");
     }
@@ -119,8 +142,9 @@ class CompanyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        _showInvestmentDialog(context, stockCode);
+      onTap: () async {
+        await fetchStockData();
+        _showInvestmentDialog(context, stockCode, high, low, price);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -150,7 +174,7 @@ class CompanyCard extends StatelessWidget {
   }
 }
 
-void _showInvestmentDialog(BuildContext context, String stockCode) {
+void _showInvestmentDialog(BuildContext context, String stockCode, String high, String low, String price) {
   int quantity = 1;
 
   showDialog(
@@ -171,9 +195,9 @@ void _showInvestmentDialog(BuildContext context, String stockCode) {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Informações do diálogo
-                const Text("Máxima do dia: R\$ "),
-                const Text("Mínima do dia: R\$ 130.00"),
-                const Text("Variação: +2.5%"),
+                Text("Alta: $high"),
+                Text("Baixa: $low"),
+                Text("Preço: \$ $price"),
                 const SizedBox(height: 100),
                 const SizedBox(width: 300),
 
