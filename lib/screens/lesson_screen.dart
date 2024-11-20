@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:invisto_app/services/lesson-service.dart';
 import 'package:invisto_app/services/quiz-service.dart';
 
-import '../services/coin-service.dart';
+import '../services/user-service.dart';
 
 class LessonScreen extends StatefulWidget {
   late final String subject;
@@ -19,7 +19,7 @@ class LessonScreen extends StatefulWidget {
 }
 
 class _LessonPageState extends State<LessonScreen> {
-  late final CoinService _coinService;
+  late final UserService _userService;
   late final LessonService _lessonService;
   late final QuizService _quizService;
   String title = '';
@@ -30,7 +30,7 @@ class _LessonPageState extends State<LessonScreen> {
   @override
   void initState() {
     super.initState();
-    _coinService = CoinService();
+    _userService = UserService();
     _lessonService = LessonService();
     _quizService = QuizService();
     _getCoin();
@@ -52,7 +52,7 @@ class _LessonPageState extends State<LessonScreen> {
   }
 
   Future<void> _addCoins(int coins) async {
-    final success = await _coinService.fetchAddCoin(coins);
+    final success = await _userService.fetchAddCoin(coins);
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Você acertou e ganhou $coins Invicoins!')),
@@ -63,7 +63,7 @@ class _LessonPageState extends State<LessonScreen> {
   }
 
   Future<void> _getCoin() async {
-    final coin = await _coinService.fetchUserCoins();
+    final coin = await _userService.fetchUserCoins();
     if(coin != null) {
       qtdInvicoin = coin;
     } else {

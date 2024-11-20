@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../services/coin-service.dart';
+import '../services/user-service.dart';
 import 'home_screen.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -12,7 +12,7 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  late final CoinService _coinService;
+  late final UserService _userService;
   late int qtdInvicoin = 0;
   late String lessonTopic;
   late int addCoins;
@@ -26,7 +26,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    _coinService = CoinService();
+    _userService = UserService();
     _getCoin();
     startCountdown();
 
@@ -56,7 +56,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Future<void> _addCoins(int coins) async {
-    final success = await _coinService.fetchAddCoin(coins);
+    final success = await _userService.fetchAddCoin(coins);
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Você acertou e ganhou $coins Invicoins!')),
@@ -67,7 +67,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Future<void> _getCoin() async {
-      final coin = await _coinService.fetchUserCoins();
+      final coin = await _userService.fetchUserCoins();
       if(coin != null) {
         qtdInvicoin = coin;
       } else {
