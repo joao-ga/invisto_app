@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:invisto_app/services/stock-service.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import '../services/coin-service.dart';
 
@@ -9,6 +14,7 @@ class InvestmentScreen extends StatefulWidget {
 
 class _InvestmentScreenState extends State<InvestmentScreen> {
   late final CoinService _coinService;
+
   int qtdInvicoin = 0;
 
   @override
@@ -28,6 +34,8 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
       print("Erro ao buscar as moedas.");
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -82,10 +90,12 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
           children: [
-            CompanyCard(companyName: 'Apple'),
-            CompanyCard(companyName: 'Pfizer'),
-            CompanyCard(companyName: 'Microsoft'),
-            CompanyCard(companyName: 'Amazon'),
+            CompanyCard(stockCode: 'AAPL'),
+            CompanyCard(stockCode: 'AMZN'),
+            CompanyCard(stockCode: 'NKE'),
+            CompanyCard(stockCode: 'DIS'),
+            CompanyCard(stockCode: 'TSLA'),
+            CompanyCard(stockCode: 'NVDA'),
           ],
         ),
       ),
@@ -94,15 +104,47 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
 }
 
 class CompanyCard extends StatelessWidget {
-  final String companyName;
+  final String stockCode;
+  String high = '';
+  String low = '';
+  String price = '';
 
-  const CompanyCard({Key? key, required this.companyName}) : super(key: key);
+  CompanyCard({super.key, required this.stockCode});
+
+  final String baseUrl = Platform.isIOS
+      ? 'http://localhost:5001/stocks'
+      : 'http://10.0.2.2:5001/stocks';
+
+  Future<dynamic> getStock(String code) async {
+    print("getStock");
+    final response = await http.post(
+      Uri.parse('$baseUrl/getLastPrice'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'code': code}),
+    );
+    final data = json.decode(response.body);
+    print("Data: $data");
+    return data;
+  }
+
+  Future<void> fetchStockData() async {
+    print("fetchStockData");
+    final stock = await getStock(stockCode);
+    if (stock != null) {
+        high = stock[0]['high'].toString();
+        low = stock[0]['low'].toString();
+        price = stock[0]['last'].toString();
+    } else {
+      print("Erro ao carregar os dados.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        _showInvestmentDialog(context, companyName);
+      onTap: () async {
+        await fetchStockData();
+        _showInvestmentDialog(context, stockCode, high, low, price);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -118,7 +160,7 @@ class CompanyCard extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            companyName,
+            stockCode,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -132,7 +174,7 @@ class CompanyCard extends StatelessWidget {
   }
 }
 
-void _showInvestmentDialog(BuildContext context, String companyName) {
+void _showInvestmentDialog(BuildContext context, String stockCode, String high, String low, String price) {
   int quantity = 1;
 
   showDialog(
@@ -145,7 +187,7 @@ void _showInvestmentDialog(BuildContext context, String companyName) {
               borderRadius: BorderRadius.circular(10),
             ),
             title: Text(
-              companyName,
+              stockCode,
               textAlign: TextAlign.center,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
@@ -153,9 +195,9 @@ void _showInvestmentDialog(BuildContext context, String companyName) {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Informações do diálogo
-                const Text("Máxima do dia: R\$ 150.00"),
-                const Text("Mínima do dia: R\$ 130.00"),
-                const Text("Variação: +2.5%"),
+                Text("Alta: $high"),
+                Text("Baixa: $low"),
+                Text("Preço: \$ $price"),
                 const SizedBox(height: 100),
                 const SizedBox(width: 300),
 
