@@ -12,7 +12,6 @@ class UserService {
 
   Future<bool> fetchAddCoin(int coins) async {
 
-
     final response = await http.post(
       Uri.parse('$baseUrl/addcoins'),
       headers: {'Content-Type': 'application/json'},
