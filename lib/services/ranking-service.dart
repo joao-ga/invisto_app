@@ -37,7 +37,7 @@ class RankingService {
       body: json.encode({'ranking': rankingId}),
     );
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
 
       // Verifique se 'data' existe e é uma lista
