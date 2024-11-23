@@ -38,6 +38,23 @@ class UserService {
     }
   }
 
+  Future<String?> fetchUserRanking() async {
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/getuserdata'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'uid': uid}),
+    );
+
+    if (response.statusCode == 201) {
+      final responseData = json.decode(response.body);
+      return responseData['data']['ranking_id'];
+    } else {
+      print("Erro ao buscar o ranking.");
+      return null;
+    }
+  }
+
   Future<dynamic> fetchUserStocks() async {
     final response = await http.post(
       Uri.parse('$baseUrl/getuserdata'),

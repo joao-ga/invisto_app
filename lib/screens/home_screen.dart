@@ -15,6 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final LessonService _lessonService;
   List<dynamic> lessons = [];
   int qtdInvicoin = 0;
+  String rankingId = '';
   late final RankingService _rankingService;
   List<Map<String, dynamic>> rankingParticipants = [];
   bool isInRanking = false;
@@ -27,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _getCoin();
     _rankingService = RankingService();
     allLessons();
+    _getRankingId();
+
   }
 
   Future<void> _getCoin() async {
@@ -38,6 +41,18 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Sucesso ao buscar as moedas.");
     } else {
       print("Erro ao buscar as moedas.");
+    }
+  }
+
+  Future<void> _getRankingId() async {
+    final ranking = await _userService.fetchUserRanking();
+    if (ranking != null) {
+      setState(() {
+        rankingId = ranking;
+      });
+      print("Sucesso ao buscar as ranking.");
+    } else {
+      print("Erro ao buscar as ranking.");
     }
   }
 
@@ -339,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    ...List.generate(7, (index) {
+                    ...List.generate(2, (index) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Container(
