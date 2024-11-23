@@ -15,6 +15,9 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> lessons = [];
   late int qtdInvicoin;
 
+  // Simula se o usuário está em um ranking
+  bool isInRanking = false;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +48,110 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void showJoinRankingDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Se juntar a um ranking"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Fecha o diálogo atual
+                  showParticipateDialog(); // Abre o próximo diálogo
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple[900],
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                ),
+                child: Text(
+                  "Participar de ranking",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isInRanking = true; // Simula que o usuário criou ou entrou em um ranking
+                  });
+                  Navigator.of(context).pop(); // Fecha o diálogo
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple[700],
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                ),
+                child: Text(
+                  "Criar um ranking",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fecha o diálogo
+              },
+              child: Text("Cancelar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showParticipateDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Participar de ranking"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: "Código de convite",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Fecha o diálogo
+              },
+              child: Text("Cancelar"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  isInRanking = true; // Simula que o usuário entrou no ranking
+                });
+                Navigator.of(context).pop(); // Fecha o diálogo
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Você entrou no ranking!")),
+                );
+              },
+              child: Text("Entrar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,10 +179,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: Container(
-        color: Colors.purple[700],
+        color: Colors.purple[700], // Define o fundo roxo
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Saldo do usuário
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+              child: Text(
+                'Saldo: R\$Valor',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+
+            // Próximas aulas
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -88,14 +209,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(height: 10),
-
             Container(
               color: Colors.purple[200],
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Container(
-                height: 150,
-                child: ListView.builder(
+                height: 150, // Altura fixa da área das aulas
+                child: lessons.isNotEmpty
+                    ? ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   itemCount: lessons.length,
@@ -106,22 +227,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: _buildClassCard(lesson),
                     );
                   },
+                )
+                    : Center(
+                  child: Text(
+                    "Nenhuma aula disponível.",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Suas simulações de investimentos',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+            // Botão Investir
             SizedBox(height: 10),
 
             Container(
@@ -171,70 +290,90 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildClassCard(dynamic lesson) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: Material(
-        color: Colors.purple[700],
-        borderRadius: BorderRadius.circular(100),
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LessonScreen(subject: lesson['subject']),
+            // Botão ou ranking
+            if (!isInRanking)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: showJoinRankingDialog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple[900],
+                      padding: const EdgeInsets.symmetric(vertical: 18.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    child: Text(
+                      "Se juntar a um ranking",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            );
-          },
-          splashColor: Colors.purple[300],
-          highlightColor: Colors.purple[200],
-          borderRadius: BorderRadius.circular(100),
-          child: Center(
-            child: Text(
-              "Aula ${lesson['subject']}",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildInvestmentSimulation() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Variação: 5%",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
+            // Renderiza o ranking apenas se isInRanking for true
+            if (isInRanking)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Ranking",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Column(
+                      children: List.generate(7, (index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Container(
+                            height: 40, // Altura reduzida para o ranking
+                            decoration: BoxDecoration(
+                              color: Colors.purple[100],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "${index + 1}° -",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "Rentabilidade: 12%",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(height: 10),
-            Icon(Icons.show_chart, color: Colors.green, size: 80),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildClassCard(dynamic lesson) => AspectRatio(
+    aspectRatio: 1,
+    child: Material(
+      child: InkWell(
+        onTap: () {},
+      ),
+    ),
+  );
 }
