@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:invisto_app/services/lesson-service.dart';
-import '../services/coin-service.dart';
+import '../services/user-service.dart';
 import 'lesson_screen.dart';
+import 'investment_screen.dart'; // Importe a InvestmentScreen
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final CoinService _coinService;
+  late final UserService _userService;
   late final LessonService _lessonService;
   List<dynamic> lessons = [];
   late int qtdInvicoin;
@@ -20,14 +21,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _coinService = CoinService();
+    _userService = UserService();
     _lessonService = LessonService();
     _getCoin();
     allLessons();
   }
 
   Future<void> _getCoin() async {
-    final coin = await _coinService.fetchUserCoins();
+    final coin = await _userService.fetchUserCoins();
     if (coin != null) {
       setState(() {
         qtdInvicoin = coin;
@@ -240,33 +241,54 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             // Botão Investir
-            SizedBox(height: 20),
+            SizedBox(height: 10),
+
+            Container(
+              color: Colors.purple[200],
+              width: double.infinity,
+              padding: const EdgeInsets.all(16.0),
+              child: _buildInvestmentSimulation(),
+            ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    print("Botão Investir clicado!");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple[200],
-                    padding: const EdgeInsets.symmetric(vertical: 18.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => InvestmentScreen(type: 'stocks'),
+                          ),
+                        );
+                      },
+                      child: Text('Investimentos'),
                     ),
                   ),
-                  child: Text(
-                    "Investir",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => InvestmentScreen(type: 'myStocks'),
+                          ),
+                        );
+                      },
+                      child: Text('Meus Investimentos'),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
+
+          ],
+        ),
+      ),
+    );
+  }
 
             // Botão ou ranking
             if (!isInRanking)
