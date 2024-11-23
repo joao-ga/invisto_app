@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (ranking != null) {
       setState(() {
         rankingId = ranking;
+        _getRankingDetails(rankingId);
       });
       print("Sucesso ao buscar as ranking.");
     } else {
@@ -60,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final participants = await _rankingService.getRanking(rankingId);
     setState(() {
       rankingParticipants = participants;
+      isInRanking = true;
     });
   }
 
@@ -68,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final success = await _rankingService.createRanking();
     if (success) {
       setState(() {
+        _getRankingId();
         isInRanking = true;
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final success = await _rankingService.enterRanking(rankingId);
     if (success) {
       setState(() {
+        _getRankingDetails(rankingId);
         isInRanking = true;
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -354,7 +358,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    ...List.generate(2, (index) {
+                    ...List.generate(rankingParticipants.length, (index) {
+                      final participant = rankingParticipants[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Container(
@@ -365,9 +370,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "${index + 1}° -",
+                                "${index + 1}° - ${participant['name']}",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "${participant['coins']} moedas",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.black,
