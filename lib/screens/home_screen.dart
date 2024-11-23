@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:invisto_app/services/lesson-service.dart';
+import '../services/ranking-service.dart';
 import '../services/user-service.dart';
 import 'lesson_screen.dart';
-import 'investment_screen.dart'; // Importe a InvestmentScreen
+import 'investment_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -13,9 +14,9 @@ class _HomeScreenState extends State<HomeScreen> {
   late final UserService _userService;
   late final LessonService _lessonService;
   List<dynamic> lessons = [];
-  late int qtdInvicoin;
-
-  // Simula se o usuário está em um ranking
+  int qtdInvicoin = 0;
+  late final RankingService _rankingService;
+  List<Map<String, dynamic>> rankingParticipants = [];
   bool isInRanking = false;
 
   @override
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _userService = UserService();
     _lessonService = LessonService();
     _getCoin();
+    _rankingService = RankingService();
     allLessons();
   }
 
@@ -36,6 +38,46 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Sucesso ao buscar as moedas.");
     } else {
       print("Erro ao buscar as moedas.");
+    }
+  }
+
+  Future<void> _getRankingDetails(String rankingId) async {
+    final participants = await _rankingService.getRanking(rankingId);
+    setState(() {
+      rankingParticipants = participants;
+    });
+  }
+
+
+  void _createRanking() async {
+    final success = await _rankingService.createRanking();
+    if (success) {
+      setState(() {
+        isInRanking = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ranking criado com sucesso!")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao criar o ranking")),
+      );
+    }
+  }
+
+  void _enterRanking(String rankingId) async {
+    final success = await _rankingService.enterRanking(rankingId);
+    if (success) {
+      setState(() {
+        isInRanking = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Você entrou no ranking!")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Falha ao entrar no ranking.")),
+      );
     }
   }
 
@@ -59,8 +101,8 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Fecha o diálogo atual
-                  showParticipateDialog(); // Abre o próximo diálogo
+                  Navigator.of(context).pop();
+                  showParticipateDialog();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple[900],
@@ -68,19 +110,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Text(
                   "Participar de ranking",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    isInRanking = true; // Simula que o usuário criou ou entrou em um ranking
-                  });
-                  Navigator.of(context).pop(); // Fecha o diálogo
+                  Navigator.of(context).pop();
+                  _createRanking();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple[700],
@@ -88,19 +125,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Text(
                   "Criar um ranking",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Fecha o diálogo
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text("Cancelar"),
             ),
           ],
@@ -110,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void showParticipateDialog() {
+    final TextEditingController codeController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -119,30 +152,30 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                controller: codeController,
                 decoration: InputDecoration(
                   labelText: "Código de convite",
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 10),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Fecha o diálogo
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text("Cancelar"),
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  isInRanking = true; // Simula que o usuário entrou no ranking
-                });
-                Navigator.of(context).pop(); // Fecha o diálogo
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Você entrou no ranking!")),
-                );
+                final rankingId = codeController.text.trim();
+                if (rankingId.isNotEmpty) {
+                  Navigator.of(context).pop();
+                  _enterRanking(rankingId);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Insira um código válido.")),
+                  );
+                }
               },
               child: Text("Entrar"),
             ),
@@ -159,9 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: Center(
           child: Image.asset(
@@ -179,15 +210,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: Container(
-        color: Colors.purple[700], // Define o fundo roxo
+        color: Colors.purple[700],
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Saldo do usuário
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               child: Text(
-                'Saldo: R\$Valor',
+                'Saldo: R\$${qtdInvicoin}',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -195,8 +225,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
-            // Próximas aulas
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -242,14 +270,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Botão Investir
             SizedBox(height: 10),
-
             Container(
               color: Colors.purple[200],
-              width: double.infinity,
-              padding: const EdgeInsets.all(16.0),
-              child: _buildInvestmentSimulation(),
-            ),
-            Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
@@ -283,41 +305,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-
-          ],
-        ),
-      ),
-    );
-  }
-
-            // Botão ou ranking
             if (!isInRanking)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: showJoinRankingDialog,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple[900],
-                      padding: const EdgeInsets.symmetric(vertical: 18.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    child: Text(
-                      "Se juntar a um ranking",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                child: ElevatedButton(
+                  onPressed: showJoinRankingDialog,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple[900],
+                    padding: const EdgeInsets.symmetric(vertical: 18.0),
+                  ),
+                  child: Text(
+                    "Se juntar a um ranking",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
-
-            // Renderiza o ranking apenas se isInRanking for true
             if (isInRanking)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -333,32 +339,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Column(
-                      children: List.generate(7, (index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Container(
-                            height: 40, // Altura reduzida para o ranking
-                            decoration: BoxDecoration(
-                              color: Colors.purple[100],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "${index + 1}° -",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
+                    ...List.generate(7, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.purple[100],
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                        );
-                      }),
-                    ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                "${index + 1}° -",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -372,7 +376,30 @@ class _HomeScreenState extends State<HomeScreen> {
     aspectRatio: 1,
     child: Material(
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LessonScreen(subject: lesson['subject']),
+            ),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.purple[300],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Text(
+              lesson['subject'],
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
       ),
     ),
   );
