@@ -13,7 +13,7 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreenState extends State<QuizScreen> {
   late final UserService _userService;
-  late int qtdInvicoin = 0;
+  late double qtdInvicoin = 0;
   late String lessonTopic;
   late int addCoins;
   late String question;

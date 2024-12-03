@@ -20,7 +20,7 @@ class InvestmentScreen extends StatefulWidget {
 class _InvestmentScreenState extends State<InvestmentScreen> {
   late final UserService _userService;
 
-  int qtdInvicoin = 0;
+  double qtdInvicoin = 0;
   List<Widget> listStocks = [];
 
   @override
@@ -63,7 +63,7 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
       if (stocks != null && stocks.isNotEmpty) {
         setState(() {
           // Aqui mapeamos a lista de strings para a lista de Widgets
-          listStocks = stocks.map<Widget>((stock) => CompanyCard(stockCode: stock)).toList();
+          listStocks = stocks.map<Widget>((stock) => CompanyCard(stockCode: stock['code'])).toList();
         });
       } else {
         print("Erro ao buscar ações do usuário.");
@@ -156,24 +156,24 @@ class CompanyCard extends StatelessWidget {
     return data;
   }
 
-  Future<dynamic> buyStock(String code) async {
+  Future<dynamic> buyStock(String code, int quantity, String lastPrice) async {
     print("buyStock");
     final response = await http.post(
       Uri.parse('$baseUrl/users/buyStock'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'uid': uid, 'code': code}),
+      body: json.encode({'uid': uid, 'code': code, 'quantity': quantity, 'lastPrice': lastPrice}),
     );
     final data = json.decode(response.body);
     print("Data: $data");
     return data;
   }
 
-  Future<dynamic> sellStock(String code) async {
+  Future<dynamic> sellStock(String code, int quantity, String actualPrice) async {
     print("sellStock");
     final response = await http.post(
       Uri.parse('$baseUrl/users/sellStock'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'uid': uid, 'code': code}),
+      body: json.encode({'uid': uid, 'code': code, 'actualPrice':actualPrice, 'qtdSell':quantity}),
     );
     final data = json.decode(response.body);
     print("Data: $data");
@@ -285,8 +285,6 @@ class CompanyCard extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Botões de ação usando Wrap para evitar overflow
-                  // Botões de ação usando Row para centralizar e espaçar uniformemente
-                  // Botões de ação usando Row para centralizar e espaçar uniformemente
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -295,7 +293,7 @@ class CompanyCard extends StatelessWidget {
                         height: 35,
                         child: ElevatedButton(
                           onPressed: () {
-                            sellStock(stockCode);
+                            sellStock(stockCode, quantity, price);
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
@@ -316,7 +314,7 @@ class CompanyCard extends StatelessWidget {
                         height: 35,
                         child: ElevatedButton(
                           onPressed: () {
-                            buyStock(stockCode);
+                            buyStock(stockCode, quantity, price);
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
