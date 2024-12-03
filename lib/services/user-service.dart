@@ -21,7 +21,7 @@ class UserService {
     return response.statusCode == 200;
   }
 
-  Future<int?> fetchUserCoins() async {
+  Future<double?> fetchUserCoins() async {
 
     final response = await http.post(
       Uri.parse('$baseUrl/getuserdata'),
@@ -71,7 +71,7 @@ class UserService {
         final stocks = responseData['data']['stocks'] as List;
 
         // Converta para List<String>
-        return stocks.map((e) => e.toString()).toList();
+        return stocks.map((e) => e);
       } else {
         print("Erro: Dados de 'stocks' ausentes ou no formato incorreto.");
         return [];

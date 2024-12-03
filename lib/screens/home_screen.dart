@@ -3,7 +3,7 @@ import 'package:invisto_app/services/lesson-service.dart';
 import '../services/ranking-service.dart';
 import '../services/user-service.dart';
 import 'lesson_screen.dart';
-import 'investment_screen.dart';
+import 'stock_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -14,7 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final UserService _userService;
   late final LessonService _lessonService;
   List<dynamic> lessons = [];
-  int qtdInvicoin = 0;
+  double qtdInvicoin = 0;
   String rankingId = '';
   late final RankingService _rankingService;
   List<Map<String, dynamic>> rankingParticipants = [];

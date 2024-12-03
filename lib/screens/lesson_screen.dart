@@ -25,7 +25,7 @@ class _LessonPageState extends State<LessonScreen> {
   String title = '';
   String introduction = '';
   String content = '';
-  late int qtdInvicoin = 0;
+  late double qtdInvicoin = 0;
 
   @override
   void initState() {
