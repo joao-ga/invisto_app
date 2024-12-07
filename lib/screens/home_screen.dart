@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invisto_app/services/lesson-service.dart';
+import '../main.dart';
 import '../services/ranking-service.dart';
 import '../services/user-service.dart';
 import 'lesson_screen.dart';
@@ -10,7 +11,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late final UserService _userService;
   late final LessonService _lessonService;
   List<dynamic> lessons = [];
@@ -29,7 +30,26 @@ class _HomeScreenState extends State<HomeScreen> {
     _rankingService = RankingService();
     allLessons();
     _getRankingId();
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Registra a tela no RouteObserver
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    // Remove a tela do RouteObserver
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Ao retornar pra HomeScreen, atualizar as moedas do usuário
+    _getCoin();
   }
 
   Future<void> _getCoin() async {
