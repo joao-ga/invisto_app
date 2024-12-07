@@ -55,7 +55,7 @@ class _LessonPageState extends State<LessonScreen> {
     final success = await _userService.fetchAddCoin(coins);
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Você acertou e ganhou $coins Invicoins!')),
+        SnackBar(content: Text('Aula finalizada. Ganhou $coins InviCoins!')),
       );
     } else {
       print("Erro ao adicionar as moedas.");
