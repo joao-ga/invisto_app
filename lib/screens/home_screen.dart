@@ -229,24 +229,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: Center(
           child: Image.asset(
             'assets/images/BlackSemFrase.png',
             height: 100,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.account_circle, size: 30),
-            onPressed: () {
-              // Função ao clicar no ícone de perfil
-            },
-          ),
-        ],
       ),
       body: Container(
         color: Colors.purple[700],
