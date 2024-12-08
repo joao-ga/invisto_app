@@ -22,7 +22,6 @@ class UserService {
   }
 
   Future<double?> fetchUserCoins() async {
-
     final response = await http.post(
       Uri.parse('$baseUrl/getuserdata'),
       headers: {'Content-Type': 'application/json'},
@@ -31,12 +30,22 @@ class UserService {
 
     if (response.statusCode == 201) {
       final responseData = json.decode(response.body);
-      return responseData['data']['coin'];
+      final coin = responseData['data']['coin'];
+
+      if (coin is int) {
+        return coin.toDouble();
+      } else if (coin is double) {
+        return coin;
+      } else {
+        print("Formato inesperado para o saldo de moedas.");
+        return null;
+      }
     } else {
       print("Erro ao buscar o saldo de moedas.");
       return null;
     }
   }
+
 
   Future<String?> fetchUserRanking() async {
 

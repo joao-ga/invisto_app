@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:invisto_app/screens/register_screen.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'home_screen.dart'; // Importação do Firebase Auth
-import 'forgotpassword_screen.dart'; // Importação da tela de recuperação de senha
+import 'home_screen.dart';
+import 'forgotpassword_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -14,58 +12,43 @@ class LoginScreen extends StatelessWidget {
 
   Future<void> loginUser(BuildContext context) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      // Realiza o login com e-mail e senha
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-      // Se o login for bem-sucedido, você pode navegar para outra tela, por exemplo
+
+      // Feedback de sucesso
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login realizado com sucesso!')),
       );
-      // Navegar para outra tela ou fazer algo após login
-      Navigator.pushReplacement(context,
+
+      // Navega para a tela inicial
+      Navigator.pushReplacement(
+        context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
-
-      //Pegar o uid do usuário logado
-      var userUid = FirebaseAuth.instance.currentUser?.uid;
-      var userEmail = FirebaseAuth.instance.currentUser?.email;
-      //Criando body do request
-      Map<String, String?> bodyRequest = {
-        'uid':userUid,
-        'email':userEmail
-      };
-
-      // Chamada à API
-      var responseUid = await http.post(
-        Uri.parse('http://10.0.2.2:5001/users/adduid'),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(bodyRequest),
-      );
-
-      if(responseUid.statusCode == 200){
-        // Sucesso
-        print('UID ADICIONADA COM SUCESSO!');
-      }else{
-        // Tratar erros
-        var jsonResponse = jsonDecode(responseUid.body);
-        var message = jsonResponse['error'] ?? 'Uid Erro, entre em contato com o suporte!';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(message),
-        ));
-      }
     } on FirebaseAuthException catch (e) {
-      String message = '';
-      if (e.code == 'user-not-found') {
-        message = 'Usuário não encontrado';
-      } else if (e.code == 'wrong-password') {
-        message = 'Senha incorreta';
-      } else {
-        message = 'Erro: ${e.message}';
+      // Trata os erros específicos do FirebaseAuth
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'Usuário não encontrado.';
+          break;
+        case 'wrong-password':
+          message = 'Senha incorreta.';
+          break;
+        default:
+          message = 'Erro: ${e.message ?? 'Erro desconhecido.'}';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      // Trata outros erros
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ocorreu um erro inesperado. Tente novamente mais tarde.')),
       );
     }
   }
@@ -73,7 +56,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300], // Cor do fundo da tela
+      backgroundColor: Colors.grey[300],
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -83,22 +66,19 @@ class LoginScreen extends StatelessWidget {
               height: 350,
               width: 300,
             ),
-
             Expanded(
               child: Container(
                 width: double.infinity,
                 decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.elliptical(125, 5),
-                        topRight: Radius.elliptical(300, 250)
-                    ),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.purpleAccent,
-                        Colors.purple
-                      ],
-                    )
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.elliptical(125, 5),
+                    topRight: Radius.elliptical(300, 250),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.purpleAccent, Colors.purple],
+                  ),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -115,9 +95,8 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      // Campo de Email
                       TextField(
-                        controller: emailController, // Controller para email
+                        controller: emailController,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -129,9 +108,8 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      // Campo de Senha
                       TextField(
-                        controller: passwordController, // Controller para senha
+                        controller: passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
                           filled: true,
@@ -144,7 +122,6 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      // Botão de Entrar
                       ElevatedButton(
                         onPressed: () => loginUser(context),
                         style: ElevatedButton.styleFrom(
@@ -164,14 +141,13 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // Links para criar conta e esquecer senha
                       GestureDetector(
                         onTap: () {
-                          // Navegar para a RegisterScreen
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RegisterPage()),
+                              builder: (context) => RegisterPage(),
+                            ),
                           );
                         },
                         child: const Text(
@@ -185,11 +161,11 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       GestureDetector(
                         onTap: () {
-                          // Navegar para a tela de recuperação de senha
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ForgotPasswordScreen()),
+                              builder: (context) => ForgotPasswordScreen(),
+                            ),
                           );
                         },
                         child: const Text(

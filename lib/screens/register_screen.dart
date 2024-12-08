@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'login_screen.dart';
+
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -24,96 +26,98 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> _registerUser() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
 
-      // Dados do formulário
-      Map<String, String> body = {
-        'name': _name.text,
-        'email': _email.text,
-        'password': _password.text,
-        'cpf': _cpf.text,
-        'birth': _dob.text,
-        'phone': _phone.text,
-        'confirmedPassword': _confirmPassword.text
-      };
+        // Dados do formulário
+        Map<String, String> body = {
+          'name': _name.text,
+          'email': _email.text,
+          'password': _password.text,
+          'cpf': _cpf.text,
+          'birth': _dob.text,
+          'phone': _phone.text,
+          'confirmedPassword': _confirmPassword.text
+        };
 
-      final String baseUrl = Platform.isIOS
-          ? 'http://localhost:5001/users/registration'
-          : 'http://10.0.2.2:5001/users/registration';
+        final String baseUrl = Platform.isIOS
+            ? 'http://localhost:5001/users/registration'
+            : 'http://10.0.2.2:5001/users/registration';
 
-      // Chamada à API
-      var response = await http.post(
-        Uri.parse(baseUrl),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(body),
-      );
+        // Chamada à API para registro
+        var response = await http.post(
+          Uri.parse(baseUrl),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(body),
+        );
 
-      if (response.statusCode == 201) {
-        var jsonResponse = jsonDecode(response.body);
+        if (response.statusCode == 201) {
+          // Registro bem-sucedido
+          var user = await _authenticateUser(_email.text, _password.text);
 
-        // Se o cadastro for bem-sucedido, autenticar usuário
-        _authenticateUser(_email.text, _password.text);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Conta criada com sucesso!'),
-        ));
-        Navigator.pop(context);
+          if (user != null) {
+            // Usuário autenticado com sucesso
+            var userUid = user.uid;
+            var userEmail = user.email;
 
-        //Com o cadastro bem-sucedido, chamar a função da API que adiciona o UID no banco de dados
+            // Criando body do request
+            Map<String, String?> bodyRequest = {
+              'uid': userUid,
+              'email': userEmail,
+            };
 
-          //Pegar o uid do usuário logado
-          var userUid = FirebaseAuth.instance.currentUser?.uid;
-          var userEmail = FirebaseAuth.instance.currentUser?.email;
-          //Criando body do request
-          Map<String, String?> bodyRequest = {
-            'uid':userUid,
-            'email':userEmail
-          };
+            final String base = Platform.isIOS
+                ? 'http://localhost:5001'
+                : 'http://10.0.2.2:5001';
 
-          // Chamada à API
-          var responseUid = await http.post(
-            Uri.parse('http://localhost:5001/users/addUidUser'),
-            headers: {"Content-Type": "application/json"},
-            body: jsonEncode(bodyRequest),
-          );
+            // Chamada à API para adicionar UID
+            var responseUid = await http.post(
+              Uri.parse('${base}/users/adduid'),
+              headers: {"Content-Type": "application/json"},
+              body: jsonEncode(bodyRequest),
+            );
 
-          if(responseUid.statusCode == 201){
-            // Sucesso
-          }else{
-            // Tratar erros
-            var jsonResponse = jsonDecode(responseUid.body);
-            var message = jsonResponse['error'] ?? 'Erro, entre em contato com o suporte!';
+            if (responseUid.statusCode == 200) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+                    (route) => false,
+              );
+            } else {
+              // Tratar erro na adição de UID
+              var jsonResponse = jsonDecode(responseUid.body);
+              var message = jsonResponse['error'] ?? 'Erro ao adicionar UID. Entre em contato com o suporte!';
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(message),
+              ));
+            }
+          } else {
+            // Tratamento se a autenticação falhar
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(message),
+              content: Text('Falha ao autenticar o usuário após registro.'),
             ));
           }
-
-      } else {
-        // Tratar erros
-        var jsonResponse = jsonDecode(response.body);
-        var message = jsonResponse['error'] ?? 'Erro, entre em contato com o suporte!';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(message),
-        ));
-      }
-
-      setState(() {
-        _isLoading = false;
-      });
+        } else {
+          // Tratar erro na criação do usuário
+          var jsonResponse = jsonDecode(response.body);
+          var message = jsonResponse['error'] ?? 'Erro, entre em contato com o suporte!';
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(message),
+          ));
+        }
     }
   }
 
-  Future<void> _authenticateUser(String email, String password) async {
+  Future<User?> _authenticateUser(String email, String password) async {
     try {
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+      return credential.user;
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Erro ao autenticar: $e'),
       ));
+      return null;
     }
   }
 
@@ -194,10 +198,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       _isLoading
                           ? const CircularProgressIndicator()
                           : ElevatedButton(
-                        onPressed: _registerUser,
+                        onPressed: _isLoading ? null : _registerUser,
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 100, vertical: 15),
+                          padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
                           backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),

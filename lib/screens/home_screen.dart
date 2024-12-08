@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:invisto_app/services/lesson-service.dart';
 import '../main.dart';
 import '../services/ranking-service.dart';
 import '../services/user-service.dart';
 import 'lesson_screen.dart';
+import 'login_screen.dart';
 import 'stock_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -76,6 +78,34 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       print("Erro ao buscar as ranking.");
     }
   }
+
+  Future<void> logout(BuildContext context) async {
+    try {
+      // Realiza o logout
+      await FirebaseAuth.instance.signOut();
+
+      // Verifica se o logout foi bem-sucedido
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        print('Usuário deslogado com sucesso.');
+      } else {
+        print('Erro: O usuário ainda está logado.');
+      }
+
+      // Navega para a tela de login removendo todas as telas anteriores
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+            (route) => false,
+      );
+    } catch (e) {
+      print('Erro ao realizar logout: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao deslogar. Tente novamente.")),
+      );
+    }
+  }
+
 
   Future<void> _getRankingDetails(String rankingId) async {
     final participants = await _rankingService.getRanking(rankingId);
@@ -235,6 +265,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             height: 100,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.purple[900]),
+            onPressed: () async {
+              await logout(context);
+            },
+          ),
+        ],
       ),
       body: Container(
         color: Colors.purple[700],
