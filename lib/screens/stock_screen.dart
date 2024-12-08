@@ -156,16 +156,17 @@ class CompanyCard extends StatelessWidget {
     return data;
   }
 
-  Future<dynamic> buyStock(String code, int quantity, String lastPrice) async {
+  Future<bool> buyStock(String code, int quantity, String lastPrice) async {
     print("buyStock");
     final response = await http.post(
       Uri.parse('$baseUrl/users/buyStock'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'uid': uid, 'code': code, 'quantity': quantity, 'lastPrice': lastPrice}),
     );
-    final data = json.decode(response.body);
-    print("Data: $data");
-    return data;
+    if(response.statusCode == 200){
+      return true;
+    }
+    return false;
   }
 
   Future<dynamic> sellStock(String code, int quantity, String actualPrice) async {
@@ -175,9 +176,10 @@ class CompanyCard extends StatelessWidget {
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'uid': uid, 'code': code, 'actualPrice':actualPrice, 'qtdSell':quantity}),
     );
-    final data = json.decode(response.body);
-    print("Data: $data");
-    return data;
+    if(response.statusCode == 200){
+      return true;
+    }
+    return false;
   }
 
   Future<void> fetchStockData() async {
@@ -292,8 +294,18 @@ class CompanyCard extends StatelessWidget {
                         width: 90,
                         height: 35,
                         child: ElevatedButton(
-                          onPressed: () {
-                            sellStock(stockCode, quantity, price);
+                          onPressed: () async {
+                            bool success = await sellStock(stockCode, quantity, price);
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Stock vendida com sucesso!')),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Você não tem ações suficientes para vender...')),
+                              );
+                            }
+
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
@@ -313,8 +325,18 @@ class CompanyCard extends StatelessWidget {
                         width: 90,
                         height: 35,
                         child: ElevatedButton(
-                          onPressed: () {
-                            buyStock(stockCode, quantity, price);
+                          onPressed: () async {
+                            bool success = await buyStock(stockCode, quantity, price);
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Stock comprada com sucesso!')),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Você não tem moedas para comprar...')),
+                              );
+                            }
+
                             Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
