@@ -65,7 +65,7 @@ class _LessonPageState extends State<LessonScreen> {
   Future<void> _getCoin() async {
     final coin = await _userService.fetchUserCoins();
     if(coin != null) {
-      qtdInvicoin = coin;
+      qtdInvicoin = double.parse(coin.toStringAsFixed(2));
     } else {
       print("Erro ao buscar as moedas.");
     }

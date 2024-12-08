@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     final coin = await _userService.fetchUserCoins();
     if (coin != null) {
       setState(() {
-        qtdInvicoin = coin;
+        qtdInvicoin = double.parse(coin.toStringAsFixed(2));
       });
       print("Sucesso ao buscar as moedas.");
     } else {

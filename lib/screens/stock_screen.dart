@@ -35,7 +35,7 @@ class _InvestmentScreenState extends State<InvestmentScreen> {
     final coin = await _userService.fetchUserCoins();
     if (coin != null) {
       setState(() {
-        qtdInvicoin = coin;
+        qtdInvicoin = double.parse(coin.toStringAsFixed(2));
       });
     } else {
       print("Erro ao buscar as moedas.");
