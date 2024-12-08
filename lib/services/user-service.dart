@@ -3,9 +3,13 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
-String? uid = FirebaseAuth.instance.currentUser?.uid;
+String? uid = "";
 
 class UserService {
+  UserService(){
+    uid = FirebaseAuth.instance.currentUser?.uid;
+  }
+
   final String baseUrl = Platform.isIOS
       ? 'http://localhost:5001/users'
       : 'http://10.0.2.2:5001/users';
