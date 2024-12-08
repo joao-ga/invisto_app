@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
-String? uid = FirebaseAuth.instance.currentUser?.uid;
-
+String? uid = "";
 class RankingService {
+  RankingService(){
+    uid = FirebaseAuth.instance.currentUser?.uid;
+  }
+
   final String baseUrl = Platform.isIOS
       ? 'http://localhost:5001/ranking'
       : 'http://10.0.2.2:5001/ranking';
