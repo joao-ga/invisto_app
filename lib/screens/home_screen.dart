@@ -52,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   void didPopNext() {
     // Ao retornar pra HomeScreen, atualizar as moedas do usuário
     _getCoin();
+    allLessons();
+    _getRankingId();
   }
 
   Future<void> _getCoin() async {
